@@ -951,6 +951,10 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
     <button class="btn btn-ghost btn-sm" onclick="filterAliments('legume',this)">🥦 Légumes</button>
     <button class="btn btn-ghost btn-sm" onclick="filterAliments('autre',this)">💊 Autres</button>
   </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <button class="btn btn-green btn-sm" onclick="importAlimentsJSON()">⬆️ Importer aliments.json</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportAlimentsJSON()">⬇️ Exporter aliments.json</button>
+  </div>
   <div id="aliments-grid" class="aliments-grid"></div>
   </div><!-- /subpanel-aliments -->
 
@@ -1150,6 +1154,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
       <div class="field"><label>Glucides (g/100g)</label><input type="number" id="edit-gluc" step="0.1" min="0"></div>
       <div class="field"><label>Lipides (g/100g)</label><input type="number" id="edit-lip" step="0.1" min="0"></div>
       <div class="field"><label>Kcal / 100g</label><input type="number" id="edit-kcal" step="1" min="0"></div>
+      <div class="field"><label>Fibres (g/100g)</label><input type="number" id="edit-fibres" step="0.1" min="0" inputmode="decimal"></div>
     </div>
     <input type="hidden" id="edit-id">
     <div style="display:flex;gap:10px;margin-top:20px">
@@ -1200,40 +1205,57 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 <script>
 // ══════════════════════════════════════════════════════════ DATA
 const DEFAULT_ALIMENTS = [
-  {id:'poulet',   nom:'Poulet (filet)',          cat:'viande',  prot:23, gluc:0,   lip:1.8, kcal:107,fibres:0.0,prixKg:6.0},
-  {id:'dinde',    nom:'Dinde (escalope)',         cat:'viande',  prot:24, gluc:0.5, lip:1.2, kcal:109,fibres:0.0,prixKg:5.5},
-  {id:'boeuf5',   nom:'Bœuf haché 5% MG',        cat:'viande',  prot:22, gluc:0.3, lip:4.6, kcal:130,fibres:0.0,prixKg:6.2},
-  {id:'jambon',   nom:'Jambon blanc dégraissé',   cat:'viande',  prot:20, gluc:1.0, lip:3.0, kcal:110,fibres:0.0,prixKg:5.5},
-  {id:'cabillaud',nom:'Cabillaud',                cat:'poisson', prot:18, gluc:0,   lip:0.7, kcal:78,fibres:0.0, prixKg:8.0},
-  {id:'saumon',   nom:'Saumon (élevage)',          cat:'poisson', prot:20, gluc:0,   lip:12,  kcal:187,fibres:0.0,prixKg:11.0},
-  {id:'thon',     nom:'Thon en boîte',            cat:'poisson', prot:23, gluc:0,   lip:1.0, kcal:103,fibres:0.0,prixKg:3.5},
-  {id:'crevettes',nom:'Crevettes',                cat:'poisson', prot:18, gluc:0.5, lip:1.5, kcal:85,fibres:0.0, prixKg:9.5},
-  {id:'oeuf',     nom:'Œufs entiers',             cat:'oeuf',    prot:13, gluc:0.3, lip:9.8, kcal:140,fibres:0.0,prixKg:2.5},
-  {id:'skyr',     nom:'Skyr nature 0%',           cat:'oeuf',    prot:11, gluc:4.0, lip:0.2, kcal:63,fibres:0.0, prixKg:3.4},
-  {id:'fromage_blanc',nom:'Fromage blanc 0%',     cat:'oeuf',    prot:7.5,gluc:3.8, lip:0.1, kcal:47,fibres:0.0, prixKg:1.8},
-  {id:'riz',      nom:'Riz basmati',               cat:'feculent',prot:7.0,gluc:78,  lip:0.8, kcal:351,fibres:1.4,prixKg:1.4},
-  {id:'quinoa',   nom:'Quinoa',                    cat:'feculent',prot:14, gluc:64,  lip:6.0, kcal:368,fibres:7.0,prixKg:2.2},
-  {id:'pdterre',  nom:'Pommes de terre',           cat:'feculent',prot:2.0,gluc:15,  lip:0.1, kcal:70,fibres:2.0, prixKg:0.8},
-  {id:'pates',    nom:'Pâtes complètes',           cat:'feculent',prot:12, gluc:71,  lip:1.8, kcal:350,fibres:6.3,prixKg:1.2},
-  {id:'patate_douce',nom:'Patate douce',           cat:'feculent',prot:1.6,gluc:20,  lip:0.1, kcal:86,fibres:3.0, prixKg:1.8},
-  {id:'brocoli',  nom:'Brocolis',                  cat:'legume',  prot:2.8,gluc:3.5, lip:0.4, kcal:31,fibres:2.6, prixKg:1.7},
-  {id:'hv',       nom:'Haricots verts',            cat:'legume',  prot:1.8,gluc:3.6, lip:0.2, kcal:22,fibres:3.4, prixKg:1.8},
-  {id:'courgette',nom:'Courgettes',                cat:'legume',  prot:1.2,gluc:2.3, lip:0.3, kcal:15,fibres:1.1, prixKg:1.5},
-  {id:'carotte',  nom:'Carottes',                  cat:'legume',  prot:0.9,gluc:7.4, lip:0.2, kcal:34,fibres:2.8, prixKg:1.2},
-  {id:'epinard',  nom:'Épinards',                  cat:'legume',  prot:2.4,gluc:1.4, lip:0.4, kcal:18,fibres:2.2, prixKg:2.0},
-  {id:'tomate',   nom:'Tomates',                   cat:'legume',  prot:0.9,gluc:2.6, lip:0.2, kcal:15,fibres:1.2, prixKg:1.5},
-  {id:'poivron',  nom:'Poivrons',                  cat:'legume',  prot:1.0,gluc:4.2, lip:0.3, kcal:22,fibres:1.6, prixKg:2.2},
-  // Aliments riches en bons lipides
-  {id:'avocat',     nom:'Avocat',                   cat:'legume',  prot:2.0, gluc:1.8, lip:15,  kcal:160, fibres:6.7, prixKg:3.50},
-  {id:'huile_olive',nom:"Huile d'olive",             cat:'autre',   prot:0,   gluc:0,   lip:100, kcal:900, fibres:0,   prixKg:8.00},
-  {id:'amandes',    nom:'Amandes',                  cat:'autre',   prot:21,  gluc:6,   lip:50,  kcal:575, fibres:12,  prixKg:12.00},
-  {id:'noix',       nom:'Noix',                     cat:'autre',   prot:15,  gluc:7,   lip:65,  kcal:654, fibres:6.7, prixKg:15.00},
-  {id:'maquereau',  nom:'Maquereau',                cat:'poisson', prot:18,  gluc:0,   lip:13,  kcal:205, fibres:0,   prixKg:4.00},
-  {id:'sardine',    nom:'Sardine (conserve)',        cat:'poisson', prot:25,  gluc:0,   lip:11,  kcal:208, fibres:0,   prixKg:3.50},
-  {id:'graines_lin',nom:'Graines de lin',            cat:'autre',   prot:18,  gluc:3,   lip:42,  kcal:450, fibres:27,  prixKg:5.00},
-  {id:'graines_chia',nom:'Graines de chia',          cat:'autre',   prot:17,  gluc:8,   lip:31,  kcal:490, fibres:34,  prixKg:12.00},
-  {id:'whey',     nom:'Whey isolate (30g)',         cat:'autre',   prot:25, gluc:2,   lip:1,   kcal:110,fibres:0.0,prixKg:0},
-  {id:'barre',    nom:'Barre protéinée',            cat:'autre',   prot:20, gluc:20,  lip:7,   kcal:200,fibres:3.0,prixKg:0},
+  {id:'lentille',nom:'Lentille (cuite)',cat:'feculent',prot:10.1,gluc:16.2,lip:0.6,kcal:125,fibres:8.4,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'pois_chiche',nom:'Pois chiche (cuit)',cat:'feculent',prot:8.3,gluc:17.7,lip:3,kcal:148,fibres:8.2,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'haricot_rouge',nom:'Haricot rouge (cuit)',cat:'feculent',prot:9.6,gluc:12.3,lip:0.6,kcal:116,fibres:11.6,prixKg:0,ratio_sec_cuit:0.45},
+  {id:'haricot_blanc',nom:'Haricot blanc (cuit)',cat:'feculent',prot:6.8,gluc:12,lip:1.1,kcal:112,fibres:13.8,prixKg:0,ratio_sec_cuit:0.45},
+  {id:'quinoa',nom:'Quinoa (cuit)',cat:'feculent',prot:4.7,gluc:27.9,lip:1.1,kcal:149,fibres:3.8,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'pdterre',nom:'Pomme de terre (crue)',cat:'feculent',prot:2,gluc:16.2,lip:0.1,kcal:80,fibres:2.2,prixKg:0,ratio_sec_cuit:1.0},
+  {id:'patate_douce',nom:'Patate douce (cuite)',cat:'feculent',prot:1.7,gluc:16.3,lip:0.1,kcal:79.1,fibres:2.9,prixKg:0,ratio_sec_cuit:1.0},
+  {id:'avoine',nom:'Flocons d\'avoine',cat:'feculent',prot:10.6,gluc:57.7,lip:7.8,kcal:369,fibres:11.2,prixKg:0,ratio_sec_cuit:0.33},
+  {id:'riz',nom:'Riz blanc (cuit)',cat:'feculent',prot:3.1,gluc:33.2,lip:0.7,kcal:155,fibres:1.4,prixKg:0,ratio_sec_cuit:0.33},
+  {id:'riz_complet',nom:'Riz complet (cuit)',cat:'feculent',prot:3.9,gluc:37.6,lip:1.8,kcal:187,fibres:2.1,prixKg:0,ratio_sec_cuit:0.33},
+  {id:'boulgour',nom:'Boulgour (cuit)',cat:'feculent',prot:4.3,gluc:24.1,lip:1,kcal:131,fibres:3.7,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'pates',nom:'Pâtes (cuites)',cat:'feculent',prot:6.1,gluc:31.4,lip:1.1,kcal:167,fibres:2.2,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'poulet',nom:'Poulet (filet, cru)',cat:'viande',prot:23.4,gluc:0,lip:1.5,kcal:110,fibres:0,prixKg:0},
+  {id:'dinde',nom:'Dinde (escalope, crue)',cat:'viande',prot:23.7,gluc:0,lip:1.5,kcal:108,fibres:0,prixKg:0},
+  {id:'boeuf5',nom:'Bœuf haché 5% MG (cru)',cat:'viande',prot:21.9,gluc:0.3,lip:4.6,kcal:130,fibres:0,prixKg:0},
+  {id:'jambon',nom:'Jambon cuit supérieur',cat:'viande',prot:21,gluc:0.8,lip:2.8,kcal:113,fibres:0,prixKg:0},
+  {id:'rumsteck',nom:'Bœuf, rumsteck (cru)',cat:'viande',prot:23.5,gluc:0.4,lip:2.5,kcal:118,fibres:0,prixKg:0},
+  {id:'filet_porc',nom:'Porc, filet mignon (cru)',cat:'viande',prot:21.2,gluc:0.4,lip:4.1,kcal:123,fibres:0,prixKg:0},
+  {id:'saumon',nom:'Saumon (élevage, cru)',cat:'poisson',prot:20.5,gluc:0,lip:12.4,kcal:193,fibres:0,prixKg:0},
+  {id:'thon',nom:'Thon (naturel, boîte)',cat:'poisson',prot:26.8,gluc:0,lip:3.9,kcal:143,fibres:0,prixKg:0},
+  {id:'maquereau',nom:'Maquereau (cru)',cat:'poisson',prot:18.1,gluc:0.9,lip:13.5,kcal:198,fibres:0,prixKg:0},
+  {id:'sardine',nom:'Sardine (huile, boîte)',cat:'poisson',prot:23.3,gluc:0.3,lip:13.7,kcal:217,fibres:0,prixKg:0},
+  {id:'cabillaud',nom:'Cabillaud (cru)',cat:'poisson',prot:18.1,gluc:0,lip:0.6,kcal:77.4,fibres:0,prixKg:0},
+  {id:'oeuf',nom:'Œuf entier (cru)',cat:'oeuf',prot:12.8,gluc:0.1,lip:9.8,kcal:140,fibres:0,prixKg:0},
+  {id:'skyr',nom:'Skyr nature 0%',cat:'oeuf',prot:10,gluc:3.8,lip:0.2,kcal:57,fibres:0,prixKg:0},
+  {id:'fromage_blanc',nom:'Fromage blanc 0% MG',cat:'oeuf',prot:7.3,gluc:4.2,lip:0,kcal:48.4,fibres:0,prixKg:0},
+  {id:'brocoli',nom:'Brocoli (cru)',cat:'legume',prot:2.9,gluc:2.1,lip:0.4,kcal:31.9,fibres:2.6,prixKg:0},
+  {id:'epinard',nom:'Épinard (cru)',cat:'legume',prot:2.7,gluc:3.1,lip:0.4,kcal:33.3,fibres:2.6,prixKg:0},
+  {id:'hv',nom:'Haricot vert (cuit)',cat:'legume',prot:2,gluc:3,lip:0.2,kcal:29.4,fibres:4,prixKg:0},
+  {id:'courgette',nom:'Courgette (crue)',cat:'legume',prot:1.2,gluc:1.8,lip:0.3,kcal:16.7,fibres:1,prixKg:0},
+  {id:'carotte',nom:'Carotte (crue)',cat:'legume',prot:0.8,gluc:5.2,lip:0,kcal:30.2,fibres:2.9,prixKg:0},
+  {id:'poivron',nom:'Poivron rouge (cru)',cat:'legume',prot:1.1,gluc:6,lip:0,kcal:33.6,fibres:3.2,prixKg:0},
+  {id:'tomate',nom:'Tomate (crue)',cat:'legume',prot:0.5,gluc:3.4,lip:0,kcal:17.5,fibres:1,prixKg:0},
+  {id:'chou_fleur',nom:'Chou-fleur (cru)',cat:'legume',prot:1.8,gluc:2.1,lip:0.7,kcal:24.9,fibres:2.2,prixKg:0},
+  {id:'chou_rouge',nom:'Chou rouge (cru)',cat:'legume',prot:1.1,gluc:4.3,lip:0,kcal:26.4,fibres:2.8,prixKg:0},
+  {id:'champignon',nom:'Champignon de Paris (cru)',cat:'legume',prot:2.1,gluc:1.8,lip:0.4,kcal:21,fibres:1,prixKg:0},
+  {id:'asperge',nom:'Asperge verte (cuite)',cat:'legume',prot:2.7,gluc:1.7,lip:0.3,kcal:25.3,fibres:2.2,prixKg:0},
+  {id:'artichaut',nom:'Artichaut (cuit)',cat:'legume',prot:2.5,gluc:1,lip:0.3,kcal:33.2,fibres:8.3,prixKg:0},
+  {id:'avocat',nom:'Avocat (cru)',cat:'legume',prot:1.6,gluc:0,lip:20.6,kcal:203,fibres:3.6,prixKg:0},
+  {id:'amandes',nom:'Amande (nature)',cat:'autre',prot:18.8,gluc:9.5,lip:51.3,kcal:615,fibres:12.5,prixKg:0},
+  {id:'noix',nom:'Noix (cerneau, séchée)',cat:'autre',prot:13.3,gluc:6.9,lip:67.3,kcal:709,fibres:6.7,prixKg:0},
+  {id:'noisette',nom:'Noisette (nature)',cat:'autre',prot:14.4,gluc:7.2,lip:56.9,kcal:632,fibres:11.6,prixKg:0},
+  {id:'huile_olive',nom:'Huile d\'olive vierge extra',cat:'autre',prot:0.2,gluc:0,lip:99.9,kcal:899,fibres:0,prixKg:0},
+  {id:'huile_noix',nom:'Huile de noix',cat:'autre',prot:0,gluc:0,lip:100,kcal:900,fibres:0,prixKg:0},
+  {id:'graines_lin',nom:'Graines de lin',cat:'autre',prot:19,gluc:6.5,lip:40.3,kcal:528,fibres:24.4,prixKg:0},
+  {id:'graines_chia',nom:'Graines de chia',cat:'autre',prot:16.5,gluc:7.7,lip:30.7,kcal:454,fibres:34.4,prixKg:0},
+  {id:'framboise',nom:'Framboise (crue)',cat:'autre',prot:1.2,gluc:5.8,lip:0.8,kcal:47.9,fibres:4.3,prixKg:0},
+  {id:'poire',nom:'Poire (crue)',cat:'autre',prot:0.4,gluc:12.3,lip:0.3,kcal:56.6,fibres:2.9,prixKg:0},
+  {id:'pomme',nom:'Pomme (crue)',cat:'autre',prot:0.2,gluc:11.6,lip:0.2,kcal:54,fibres:1.4,prixKg:0},
+  {id:'whey',nom:'Whey protéine',cat:'autre',prot:75,gluc:6,lip:4,kcal:367,fibres:0,prixKg:0},
+  {id:'barre',nom:'Barre protéinée',cat:'autre',prot:20,gluc:20,lip:7,kcal:200,fibres:3,prixKg:0},
 ];
 
 const DEFAULT_BATCH = [
@@ -1334,9 +1356,9 @@ function initJours() {
       // Petit-dej : toggle skyr+whey (pdj_mode: 'skyrwhey' | 'rien')
       pdj_mode: type==='petit-dejeuner' ? 'skyrwhey' : undefined,
       viande_id: type==='petit-dejeuner' ? '' : '',
-      viande_g:  type==='petit-dejeuner' ? 0 : 150,   // 150g cru viande/poisson (PNNS)
-      feculent_id:'', feculent_g: type==='petit-dejeuner' ? 0 : 80,    // 80g cru féculent (PNNS)
-      legume_id:'',   legume_g:   type==='petit-dejeuner' ? 0 : 200,  // 200g cru légume (PNNS)
+      viande_g:  type==='petit-dejeuner' ? 0 : 150,   // 150g cru (PNNS)
+      feculent_id:'', feculent_g: type==='petit-dejeuner' ? 0 : 150,  // 150g cuit (PNNS ~1 portion)
+      legume_id:'',   legume_g:   type==='petit-dejeuner' ? 0 : 200,  // 200g cru (PNNS)
       // Repas manuel (déj inactif)
       manuel_active: false,
       manuel_kcal:0, manuel_prot:0, manuel_gluc:0, manuel_lip:0,
@@ -1588,7 +1610,7 @@ function renderRepasRow(ji, ri, repas) {
         <div><label>g</label><input type="number" min="0" max="600" step="10" value="${repas.viande_g||0}" onchange="updateRepas(${ji},${ri},'viande_g',+this.value)" inputmode="numeric"></div>
       </div>
       <div class="repas-grid-mobile">
-        <div><label>🍚 Féculent <span style="font-size:10px;color:var(--muted)">(g cru)</span></label>
+        <div><label>🍚 Féculent <span id="fec-label-${ji}-${ri}" style="font-size:10px;color:var(--info)">${(()=>{const _aF=getA(repas.feculent_id);return _aF&&_aF.ratio_sec_cuit&&_aF.ratio_sec_cuit<1?"(g cuit)":"(g cru)"})()}</span></label>
           <select onchange="updateRepas(${ji},${ri},'feculent_id',this.value)">
             <option value="">— Aucun —</option>
             ${feculents.map(a=>`<option value="${a.id}"${repas.feculent_id===a.id?' selected':''}>${a.nom}</option>`).join('')}
@@ -1649,7 +1671,8 @@ function renderTotaux() {
   const obj = state.objectifs;
   const moyTot = n ? {prot:tot.prot/n,gluc:tot.gluc/n,lip:tot.lip/n,kcal:tot.kcal/n} : {prot:0,gluc:0,lip:0,kcal:0};
   const scoreS = getScoreJour(moyTot, obj);
-  document.getElementById('totaux-semaine').innerHTML = [
+  const _tot = document.getElementById('totaux-semaine'); if(!_tot) return;
+  _tot.innerHTML = [
     {lbl:'Kcal semaine',val:r0(tot.kcal),moy:n?r0(tot.kcal/n):0,ob:obj.kcal,unit:'kcal',col:'var(--purple)',target:obj.kcal*n},
     {lbl:'Protéines',   val:r0(tot.prot),moy:n?r0(tot.prot/n):0,ob:obj.prot,unit:'g',   col:'var(--accent)', target:obj.prot*n},
     {lbl:'Glucides',    val:r0(tot.gluc),moy:n?r0(tot.gluc/n):0,ob:obj.gluc,unit:'g',   col:'var(--accent2)',target:obj.gluc*n},
@@ -1669,7 +1692,7 @@ function renderTotaux() {
 
 function updatePill() {
   const n = state.jours.filter(j=>j.active).reduce((a,j)=>a+j.repas.filter(r=>r.active).length,0);
-  document.getElementById('pill-repas').textContent = `${n} repas`;
+  const _pill = document.getElementById('pill-repas'); if(_pill) _pill.textContent = `${n} repas`;
 }
 
 function toggleRepasCollapse(ji, ri) {
@@ -1878,7 +1901,7 @@ function switchJourneeMode(mode) {
 
 function renderJourneeContent() {
   const cont = document.getElementById('journee-content');
-  if(!cont) return;
+  if(!cont || cont.closest('#journee-panel-vue')?.style.display === 'none') return;
   const ji = state.selectedJour;
   const jour = state.jours[ji];
   if(!jour) return;
@@ -2022,7 +2045,7 @@ function renderJourneeContent() {
       </div>
       <div class="gram-row">
         ${aV ? `<div class="gram-item"><div class="gram-label">🥩 Protéine</div><div class="gram-val" style="color:var(--red)">${r.viande_g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${aV.nom}</div></div>` : ''}
-        ${aF ? '<div class="gram-item"><div class="gram-label">🍚 Féculent (cuit)</div><div class="gram-val" style="color:var(--accent2)">'+r.feculent_g+'<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">'+aF.nom+'</div></div>' : ''}
+        ${aF ? '<div class="gram-item"><div class="gram-label">🍚 Féculent</div><div class="gram-val" style="color:var(--accent2)">'+r.feculent_g+'<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">'+aF.nom+(aF.ratio_sec_cuit&&aF.ratio_sec_cuit<1?' <span style="font-size:10px;color:var(--info)">(cuit)</span>':'')+'</div></div>' : ''}
         ${aL ? `<div class="gram-item"><div class="gram-label">🥦 Légume</div><div class="gram-val" style="color:var(--accent)">${r.legume_g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${aL.nom}</div></div>` : ''}
         ${(r.extras||[]).map(ex=>{const aE=getA(ex.id);return aE?`<div class="gram-item"><div class="gram-label">➕ ${aE.nom}</div><div class="gram-val" style="color:var(--muted)">${ex.g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${r0(calcM(aE.id,ex.g).kcal)} kcal</div></div>`:''}).join('')}
       </div>
@@ -2096,11 +2119,19 @@ function generateCourses() {
         qtyStr=`${nJColl} portions`; note='Collation journalière';
       } else {
         if(!gT) return;
-        qtyStr = gT>=1000 ? `${r1(gT/1000)} kg` : `${r0(gT)} g`;
+        if(a.cat==='feculent' && a.ratio_sec_cuit && a.ratio_sec_cuit < 1) {
+          // Convertir cuit → sec pour l'achat
+          const gSec = r0(gT * a.ratio_sec_cuit);
+          const secStr = gSec>=1000 ? r1(gSec/1000)+' kg' : gSec+'g';
+          qtyStr = gT>=1000 ? r1(gT/1000)+' kg cuit' : r0(gT)+'g cuit';
+          note = `⚖️ Acheter <strong>${secStr} sec</strong>`;
+        } else {
+          qtyStr = gT>=1000 ? `${r1(gT/1000)} kg` : `${r0(gT)} g`;
+        }
         if(a.cat==='viande'||a.cat==='poisson') note='Batch cook dimanche';
         if(a.id==='skyr') note='PDJ — '+nPdjSkyr+' × 250g';
         if(a.id==='whey' && usage['whey']>0) note='PDJ — '+nPdjSkyr+' × 30g';
-        if(a.cat==='feculent') note = 'Cru';
+        if(a.cat==='feculent' && (!a.ratio_sec_cuit || a.ratio_sec_cuit>=1)) note='Peser cuit';
       }
       const prix = a.prixKg ? r1(gT*a.prixKg/1000) : 0;
       if(prix) total += prix;
@@ -2232,8 +2263,11 @@ function shareCourses() {
         qtyStr = `${nJ} portions`;
       } else {
         if(!gT) return;
-        {
-          qtyStr = gT>=1000?`${r1(gT/1000)} kg`:`${r0(gT)}g`;
+        if(a.cat==='feculent' && a.ratio_sec_cuit && a.ratio_sec_cuit < 1) {
+          const gSec = r0(gT * a.ratio_sec_cuit);
+          qtyStr = gSec>=1000 ? r1(gSec/1000)+' kg sec' : gSec+'g sec';
+        } else {
+          qtyStr = gT>=1000 ? `${r1(gT/1000)} kg` : `${r0(gT)}g`;
         }
       }
       const prix = a.prixKg ? `~${r1(gT*(a.prixKg||0)/1000)}€` : '';
@@ -2521,6 +2555,59 @@ function calibrateAllJours() {
   toast('Tous les repas calibrés ✓');
 }
 
+
+// ══════════════════════════════════════════════════════════ IMPORT ALIMENTS JSON
+function importAlimentsJSON() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        // Accepter les deux formats : tableau direct ou {aliments:[...]}
+        const list = Array.isArray(parsed) ? parsed : parsed.aliments;
+        if(!Array.isArray(list)) throw new Error('Format invalide — attendu: [{id,nom,cat,...}]');
+        // Valider les champs obligatoires
+        const required = ['id','nom','cat','prot','gluc','lip','kcal'];
+        const invalid = list.filter(a => required.some(k => a[k]===undefined));
+        if(invalid.length) throw new Error(`${invalid.length} aliment(s) avec champs manquants`);
+        if(!confirm(`Importer ${list.length} aliments ?\nCela remplacera la base actuelle.`)) return;
+        state.aliments = list.map(a => ({
+          ...a,
+          fibres: +(a.fibres||0),
+          prixKg: +(a.prixKg||0),
+        }));
+        saveState(); renderAliments(); renderPlanning();
+        toast(`${list.length} aliments importés ✓`);
+      } catch(err) {
+        alert('Erreur import : ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function exportAlimentsJSON() {
+  const data = {
+    _notice: "Valeurs Ciqual 2021 — 100g cru. Importer via Paramètres > Aliments.",
+    _colonnes: {id:"identifiant unique",nom:"nom affiché",cat:"viande|poisson|oeuf|feculent|legume|autre",prot:"g/100g",gluc:"g/100g",lip:"g/100g",kcal:"kcal/100g",fibres:"g/100g",prixKg:"€/kg"},
+    aliments: state.aliments
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mealprep_aliments.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Base aliments exportée ✓');
+}
+
 // ══════════════════════════════════════════════════════════ BATCH QUANTITES
 function calcBatchQtys() {
   // Agréger viande, feculent, legume par id depuis le planning
@@ -2547,6 +2634,12 @@ function formatBatchQty(id, qtys) {
   if(!q) return null;
   const g = q.g_total;
   const gStr = g >= 1000 ? r1(g/1000)+' kg' : g+'g';
+  const a = getA(id);
+  if(a && a.ratio_sec_cuit && a.ratio_sec_cuit < 1) {
+    const gSec = r0(q.g_total * a.ratio_sec_cuit);
+    const gSecStr = gSec>=1000 ? r1(gSec/1000)+' kg' : gSec+'g';
+    return `<span style="font-weight:700;color:var(--info)">${gSecStr} sec</span> <span style="color:var(--text2);font-size:11px">→ ${gStr} cuit</span>`;
+  }
   return `<span style="font-weight:700">${gStr}</span>`;
 }
 
@@ -2702,8 +2795,8 @@ function addExercice() {
   if(!state.exercices[date]) state.exercices[date] = [];
   state.exercices[date].push({nom, kcal: +kcal, id: Date.now()});
   saveState(); renderBilan();
-  document.getElementById('exo-nom').value = '';
-  document.getElementById('exo-kcal').value = '';
+  const _en = document.getElementById('exo-nom'); if(_en) _en.value = '';
+  const _ek = document.getElementById('exo-kcal'); if(_ek) _ek.value = '';
   toast('Exercice ajouté ✓');
 }
 
@@ -2829,7 +2922,8 @@ function renderAliments() {
   const filter = state.currentFilter||'all';
   const list = filter==='all' ? state.aliments : state.aliments.filter(a=>a.cat===filter);
   const catN = {viande:'Viande',poisson:'Poisson',oeuf:'Œuf/Lait',feculent:'Féculent',legume:'Légume',autre:'Autre'};
-  document.getElementById('aliments-grid').innerHTML = list.map(a=>`
+  const _ag = document.getElementById('aliments-grid'); if(!_ag) return;
+  _ag.innerHTML = list.map(a=>`
     <div class="aliment-card">
       <div><div class="aliment-cat">${catN[a.cat]||a.cat}</div><div class="aliment-name">${a.nom}</div></div>
       <div style="font-size:11px;color:var(--muted)">Pour 100g :</div>
@@ -2838,6 +2932,7 @@ function renderAliments() {
         <span class="mini-macro mm-g">${a.gluc}g G</span>
         <span class="mini-macro mm-l">${a.lip}g L</span>
         <span class="mini-macro mm-k">${a.kcal} kcal</span>
+        ${(a.fibres||0)>0?`<span class="mini-macro mm-f">${a.fibres}g F</span>`:''}
       </div>
       <div class="aliment-actions">
         <button class="btn btn-ghost btn-sm" onclick="editAliment('${a.id}')">✏️ Modifier</button>
@@ -2856,6 +2951,7 @@ function filterAliments(cat,btn) {
 function addAliment() {
   const nom=document.getElementById('new-nom').value.trim();
   const cat=document.getElementById('new-cat').value;
+  const newFib=+document.getElementById('new-fib')?.value||0;
   const prot=+document.getElementById('new-prot').value;
   const gluc=+document.getElementById('new-gluc').value;
   const lip=+document.getElementById('new-lip').value;
@@ -2902,13 +2998,16 @@ function deleteAliment(id) {
 
 function editAliment(id) {
   const a=getA(id); if(!a) return;
-  document.getElementById('edit-id').value  =id;
-  document.getElementById('edit-nom').value =a.nom;
-  document.getElementById('edit-cat').value =a.cat;
-  document.getElementById('edit-prot').value=a.prot;
-  document.getElementById('edit-gluc').value=a.gluc;
-  document.getElementById('edit-lip').value =a.lip;
-  document.getElementById('edit-kcal').value=a.kcal;
+  const _ef = (id) => { const el = document.getElementById(id); return el; };
+  const setV = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+  setV('edit-id',   id);
+  setV('edit-nom',  a.nom);
+  setV('edit-cat',  a.cat);
+  setV('edit-prot', a.prot);
+  setV('edit-gluc', a.gluc);
+  setV('edit-lip',  a.lip);
+  setV('edit-kcal', a.kcal);
+  setV('edit-fibres', a.fibres||0);
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -2921,11 +3020,12 @@ function saveEditAliment() {
   const gluc=+document.getElementById('edit-gluc').value;
   const lip=+document.getElementById('edit-lip').value;
   const kcal=+document.getElementById('edit-kcal').value;
+  const fibres=+document.getElementById('edit-fibres').value||0;
   const prix=+document.getElementById('edit-prix').value||0;
   if(!nom){toast('Le nom est requis'); return;}
   const idx=state.aliments.findIndex(a=>a.id===id);
   if(idx===-1) return;
-  state.aliments[idx]={...state.aliments[idx],nom,cat,prot,gluc,lip,kcal};
+  state.aliments[idx]={...state.aliments[idx],nom,cat,prot,gluc,lip,kcal,fibres};
   saveState(); renderAliments(); renderPlanning(); closeModal();
   toast('Aliment modifié ✓');
 }
@@ -2951,7 +3051,8 @@ function renderSuivi() {
   const obj=state.objectifs.poidscible||80;
   const lbl=document.getElementById('suivi-obj-lbl');
   if(lbl) lbl.textContent=`${obj} kg`;
-  document.getElementById('suivi-tbody').innerHTML=[...state.suivi].reverse().map((s,i,arr)=>{
+  const _st = document.getElementById('suivi-tbody'); if(!_st) return;
+  _st.innerHTML=[...state.suivi].reverse().map((s,i,arr)=>{
     const prev=arr[i+1];
     const v=prev?r1(s.poids-prev.poids):null;
     const e=r1(s.poids-obj);
@@ -3738,13 +3839,17 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderObjectifs();
   calcTDEE();
   renderRepasTypes();
-  renderJournee();
-  renderEau();
+  renderAliments();
   renderHistorique();
-  // Date défaut pour exercice
   const exoDate = document.getElementById('exo-date');
   if(exoDate) exoDate.value = new Date().toISOString().split('T')[0];
   showTab('journee');
+  // Laisser le DOM se stabiliser avant le premier rendu
+  setTimeout(() => {
+    renderJournee();
+    renderEau();
+    switchJourneeMode('vue');
+  }, 0);
 });
 </script>
 </body>
