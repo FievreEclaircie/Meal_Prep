@@ -2,6 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+  <!-- PWA / iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MealPrep">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0F1117" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F8F9FA" media="(prefers-color-scheme: light)">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230F1117'/%3E%3Ctext x='256' y='340' font-size='300' text-anchor='middle'%3E%F0%9F%A5%97%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MealPrep</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,7 +37,7 @@
   /* Texte */
   --text:    #E6EDF3;
   --text2:   #8B949E;
-  --text3:   #6E7681;
+  --text3:   #8B949E;
 
   /* Accent unique : vert */
   --accent:       #16A34A;
@@ -41,6 +50,8 @@
   --warn:    #D29922;
   --info:    #58A6FF;
   --muted:   #8B949E;
+  --purple:  #8B5CF6;
+  --purple-dim: #8B5CF611;
 
   /* Typographie */
   --font-display: 'DM Serif Display', Georgia, serif;
@@ -63,7 +74,7 @@
   --r5: 24px;
 
   /* Ombres */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.2);
   --shadow-md: 0 4px 16px rgba(0,0,0,.5);
 }
 
@@ -76,7 +87,7 @@ body.light {
   --border2: #CED4DA;
   --text:    #212529;
   --text2:   #495057;
-  --text3:   #868E96;
+  --text3:   #6C757D;
   --accent:       #16A34A;
   --accent-light: #15803D;
   --accent-dim:   #16A34A18;
@@ -84,15 +95,20 @@ body.light {
   --danger:  #DC2626;
   --warn:    #CA8A04;
   --info:    #2563EB;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
   --shadow-md: 0 4px 16px rgba(0,0,0,.12);
+  /* Variables sémantiques manquantes */
+  --accent2:  #2563EB;
+  --accent3:  #D97706;
+  --muted:    #6C757D;
+  --purple:   #7C3AED;
 }
 
 /* ── Reset ──────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.6;
   background: var(--bg);
   color: var(--text);
@@ -105,19 +121,18 @@ a:hover { text-decoration: underline; }
 /* ── Typographie ────────────────────────────────────── */
 h1 {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 400;
-  letter-spacing: -.3px;
-  line-height: 1.25;
+  letter-spacing: -.5px;
+  line-height: 1.2;
   color: var(--text);
 }
 h2 {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--text3);
+  letter-spacing: .1px;
+  color: var(--text2);
   margin-bottom: var(--s3);
 }
 .section-title { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s4); }
@@ -154,7 +169,7 @@ nav::-webkit-scrollbar { display: none; }
   color: var(--text3);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  transition: color .15s, border-color .15s;
+  transition: color .18s ease, border-color .18s ease;
   display: flex; align-items: center;
   white-space: nowrap;
   min-height: 52px;
@@ -186,8 +201,9 @@ nav::-webkit-scrollbar { display: none; }
 .card {
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: var(--r3);
+  border-radius: var(--r4);
   padding: var(--s4);
+  box-shadow: var(--shadow-sm);
 }
 .card + .card { margin-top: var(--s3); }
 .card-grid   { display: grid; gap: var(--s3); }
@@ -219,7 +235,12 @@ textarea {
 }
 input:focus, select:focus, textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-dim);
+  box-shadow: 0 0 0 3px var(--accent-dim), 0 0 0 1px var(--accent)44;
+  outline: none;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%238B949E'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
 select option { background: var(--bg2); color: var(--text); }
@@ -236,19 +257,20 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: all .15s;
-  min-height: 44px; /* WCAG */
+  transition: all .18s ease;
+  min-height: 48px; /* WCAG + confort tactile */
   white-space: nowrap;
   letter-spacing: .1px;
 }
-.btn-green  { background: var(--accent); color: #fff; }
+.btn-green  { background: var(--accent); color: #fff; letter-spacing: .2px; }
 .btn-green:hover { background: var(--accent-hover); }
 .btn-ghost  { background: transparent; color: var(--text2); border: 1px solid var(--border); }
 .btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
 .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger)44; }
 .btn-danger:hover { background: var(--danger)11; }
-.btn-sm { padding: 7px 14px; font-size: 13px; min-height: 36px; }
+.btn-sm { padding: 8px 16px; font-size: 13px; min-height: 44px; }
 .btn-xs { padding: 4px 10px; font-size: 12px; min-height: 28px; }
+.btn:disabled, .btn[disabled] { opacity: .45; cursor: not-allowed; pointer-events: none; }
 
 /* ── Toggles ─────────────────────────────────────────── */
 .toggle-wrap { display: flex; align-items: center; gap: var(--s2); cursor: pointer; }
@@ -305,12 +327,12 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   font-size: 11px;
   font-weight: 700;
 }
-.mm-k { background: #7C3AED11; color: #A78BFA; border: 1px solid #7C3AED22; }
-.mm-p { background: var(--accent-dim); color: var(--accent-light); border: 1px solid var(--accent)22; }
-.mm-g { background: var(--info)11; color: var(--info); border: 1px solid var(--info)22; }
-.mm-l { background: var(--warn)11; color: var(--warn); border: 1px solid var(--warn)22; }
-.mm-f { background: #8B5CF611; color: #8B5CF6; border: 1px solid #8B5CF622; }
-.mini-macro[style*="purple"] { background: #7C3AED11; color: #A78BFA; border: 1px solid #7C3AED22; }
+.mm-k { background: rgba(8,145,178,0.08);  color: #0891B2; border: 1px solid rgba(8,145,178,0.15); }
+.mm-p { background: rgba(22,163,74,0.08);  color: var(--accent-light); border: 1px solid rgba(22,163,74,0.15); }
+.mm-g { background: rgba(37,99,235,0.08);  color: var(--info); border: 1px solid rgba(37,99,235,0.15); }
+.mm-l { background: rgba(210,153,34,0.08); color: var(--warn); border: 1px solid rgba(210,153,34,0.15); }
+.mm-f { background: rgba(124,58,237,0.08); color: #7C3AED; border: 1px solid rgba(124,58,237,0.15); }
+.mini-macro[style*="purple"] { background: var(--purple-dim); color: var(--purple); border: 1px solid var(--purple)22; }
 
 /* ── Score badges ───────────────────────────────────── */
 .score-badge {
@@ -319,7 +341,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   border-radius: var(--r2);
   font-weight: 700; font-size: 12px;
 }
-.score-green  { background: var(--accent-dim);  color: var(--accent-light); border: 1px solid var(--accent)33; }
+.score-green  { background: var(--accent-dim); color: var(--accent-light); border: 1px solid var(--accent)33; }
 .score-orange { background: var(--warn)11;      color: var(--warn);         border: 1px solid var(--warn)33; }
 .score-red    { background: var(--danger)11;    color: var(--danger);       border: 1px solid var(--danger)33; }
 
@@ -356,6 +378,8 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 }
 
 /* ── Sous-onglets ───────────────────────────────────── */
+.sub-panel { display: none; }
+.sub-panel.active { display: block; }
 .sub-tabs {
   display: flex;
   gap: var(--s1);
@@ -364,10 +388,12 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   border-radius: var(--r3);
   padding: 4px;
   margin-bottom: var(--s4);
+  flex-wrap: wrap;
 }
 .sub-tab {
   flex: 1;
-  padding: 8px var(--s3);
+  min-width: 80px;
+  padding: 10px var(--s3);
   border-radius: var(--r2);
   font-size: 13px;
   font-weight: 600;
@@ -375,10 +401,12 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   border: none;
   background: transparent;
   color: var(--text2);
-  transition: all .15s;
+  transition: all .18s ease;
   text-align: center;
-  min-height: 40px;
+  min-height: 44px;
   font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .sub-tab:hover { color: var(--text); }
 .sub-tab.active {
@@ -391,35 +419,49 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 /* ── Sélecteur de jour ──────────────────────────────── */
 .jour-select-bar {
   display: flex;
-  gap: var(--s2);
-  overflow-x: auto;
-  padding-bottom: var(--s1);
+  gap: 0;
   margin-bottom: var(--s4);
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.jour-select-bar::-webkit-scrollbar { display: none; }
-.jour-btn {
-  flex-shrink: 0;
-  padding: 8px 14px;
-  border-radius: var(--r2);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 2px solid var(--border);
   background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  padding: 3px;
+  width: 100%;
+}
+.jour-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 2px;
+  border-radius: var(--r2);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: transparent;
   color: var(--text2);
-  transition: all .15s;
+  transition: background .18s ease, color .18s ease;
   text-align: center;
   min-height: 44px;
-  min-width: 64px;
   font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-.jour-btn:hover { border-color: var(--border2); color: var(--text); }
+.jour-btn:hover { color: var(--text); }
 .jour-btn.selected {
   background: var(--accent);
   color: #fff;
-  border-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(22,163,74,.35);
+}
+.jour-btn-semaine {
+  flex: 0 0 44px;
+  border-left: 1px solid var(--border);
+  border-radius: 0 var(--r2) var(--r2) 0;
+  font-size: 16px;
+  padding: 9px 0;
+}
+.jour-btn-semaine.selected {
+  background: var(--bg2);
+  color: var(--accent);
+  box-shadow: none;
 }
 
 /* ── Day card ────────────────────────────────────────── */
@@ -473,32 +515,32 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   padding: var(--s2) var(--s3);
   text-align: center;
 }
-.gram-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.gram-label { font-size: 12px; color: var(--text3); font-weight: 600; margin-bottom: 4px; }
 .gram-val { font-family: var(--font-display); font-size: 22px; line-height: 1.2; }
 .gram-aliment { font-size: 11px; color: var(--text2); margin-top: 2px; }
 .repas-grid-mobile { display: grid; grid-template-columns: 1fr 80px; gap: var(--s2); }
 
 /* ── Courses ─────────────────────────────────────────── */
-.courses-table { width: 100%; border-collapse: collapse; }
+.courses-table { width: 100%; border-collapse: collapse; table-layout: auto; }
 .courses-table th {
   text-align: left;
-  font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
-  color: var(--text3);
-  padding: var(--s2) var(--s3);
+  font-size: 12px; font-weight: 700;
+  color: var(--text2);
+  padding: var(--s2) var(--s2);
   border-bottom: 2px solid var(--border);
 }
 .courses-table td {
-  padding: var(--s2) var(--s3);
-  border-bottom: 1px solid var(--border)55;
+  padding: var(--s2) var(--s2);
+  border-bottom: 1px solid rgba(255,255,255,.06);
   font-size: 14px;
-  vertical-align: middle;
+  vertical-align: top;
 }
 .courses-table tr:hover td { background: var(--bg3); }
 .cat-header td {
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
   color: var(--text3);
   background: var(--bg2);
-  padding: var(--s3) var(--s3) var(--s2);
+  padding: var(--s3) var(--s2) var(--s2);
   border-top: 2px solid var(--border);
 }
 .qty-total { font-weight: 700; font-size: 15px; }
@@ -590,7 +632,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   border-radius: 50%;
   background: var(--bg3);
   border: 2px solid var(--border2);
-  transition: all .15s;
+  transition: all .18s ease;
 }
 .batch-card-top { display: flex; align-items: flex-start; gap: var(--s3); justify-content: space-between; }
 .batch-card-left { flex: 1; }
@@ -613,7 +655,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   cursor: pointer;
   font-size: 14px;
   display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
+  transition: all .18s ease;
   flex-shrink: 0;
   color: var(--text3);
 }
@@ -627,7 +669,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   font-size: 12px; font-weight: 700;
   color: var(--warn);
   cursor: pointer;
-  transition: all .15s;
+  transition: all .18s ease;
 }
 .timer-badge:hover { border-color: var(--warn); }
 .timer-badge.running { border-color: var(--warn); background: var(--warn)11; animation: pulse 1s infinite; }
@@ -676,7 +718,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   font-weight: 600; font-size: 13px;
   z-index: 999;
   opacity: 0; transform: translateY(8px);
-  transition: all .2s;
+  transition: all .18s ease;
   pointer-events: none;
   box-shadow: var(--shadow-md);
   max-width: 320px;
@@ -709,6 +751,8 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 .mobile-tab .m-icon { font-size: 20px; line-height: 1; }
 .mobile-tab .m-label { font-size: 9px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
 .mobile-tab.active { color: var(--accent-light); }
+.mobile-tab.active .m-icon { transform: scale(1.1); }
+.mobile-tab.active .m-label { font-weight: 700; }
 
 /* ── Semaine header ──────────────────────────────────── */
 .week-nav {
@@ -788,12 +832,23 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   .page { padding: var(--s3) var(--s3) 80px; }
   .toast { bottom: 80px; }
   .suivi-grid, .obj-grid, .card-grid-4, .card-grid-2 { grid-template-columns: 1fr; }
-  h1 { font-size: 22px; }
+  h1 { font-size: 26px; }
   input[type=text], input[type=number], input[type=date], select { font-size: 16px; }
   .gram-row { grid-template-columns: 1fr 1fr; }
   .batch-check-btn { width: 44px; height: 44px; font-size: 18px; }
   .repas-grid-mobile { grid-template-columns: 1fr 72px; }
 }
+
+
+/* ── États vides ─────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: var(--s7) var(--s4);
+  color: var(--text2);
+}
+.empty-state-icon { font-size: 48px; margin-bottom: var(--s3); opacity: .5; }
+.empty-state-title { font-size: 18px; font-weight: 700; margin-bottom: var(--s2); color: var(--text); }
+.empty-state-sub { font-size: 14px; color: var(--text2); line-height: 1.6; max-width: 280px; margin: 0 auto var(--s4); }
 
 /* ── Utilitaires ─────────────────────────────────────── */
 .flex { display: flex; }
@@ -810,7 +865,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 .mb-2 { margin-bottom: var(--s3); }
 .mb-3 { margin-bottom: var(--s4); }
 .text-sm { font-size: 12px; }
-.text-xs { font-size: 11px; }
+.text-xs { font-size: 12px; }
 .text-muted { color: var(--text2); }
 .text-faint { color: var(--text3); }
 .text-accent { color: var(--accent-light); }
@@ -821,14 +876,14 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 <body>
 
 <nav>
-  <div class="nav-logo">Meal<span>Prep</span></div>
+  <div class="nav-logo" id="nav-logo-label">Meal<span>Prep</span></div>
   <div class="nav-tab active" onclick="showTab('journee')">☀️ Ma journée</div>
   <div class="nav-tab" onclick="showTab('courses')">🛒 Courses</div>
   <div class="nav-tab" onclick="showTab('batch')">👨‍🍳 Batch</div>
   <div class="nav-tab" onclick="showTab('historique')">📅 Historique</div>
   <div class="nav-tab" onclick="showTab('suivi')">📈 Suivi</div>
   <div class="nav-tab" onclick="showTab('parametres')">⚙️ Paramètres</div>
-  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">☀️ Mode jour</button>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙 Mode sombre</button>
 </nav>
 
 
@@ -843,8 +898,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
       <button onclick="changeWeek(1)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 2px;line-height:1">›</button>
     </div>
     <input type="date" id="semaine-date" onchange="saveState();renderPlanning();updateSemaineLabel();this.style.display='none'" style="display:none;width:1px;height:1px;opacity:0;position:absolute">
-    <button class="btn btn-ghost btn-sm" onclick="printView('planning')">🖨 Imprimer</button>
-    <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red)44" onclick="resetAll()">🗑 Reset</button>
+
   </div>
   <!-- Sélecteur de jour commun -->
   <div class="jour-select-bar" id="jour-select-bar"></div>
@@ -868,10 +922,8 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   <!-- Panel Éditer -->
   <div id="journee-panel-edit" style="display:none">
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-      <button class="btn btn-ghost btn-sm" onclick="toggleAllDays(true)">Activer tous les jours</button>
-      <button class="btn btn-ghost btn-sm" onclick="toggleAllDays(false)">Désactiver tous</button>
       <button class="btn btn-ghost btn-sm" style="color:var(--accent2);border-color:var(--accent2)44" onclick="calibrateAllRepas()">⚖️ Calibrer le jour</button>
-      <button class="btn btn-ghost btn-sm" style="color:var(--accent2);border-color:var(--accent2)44" onclick="calibrateAllJours()">⚖️ Calibrer toute la semaine</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--accent2);border-color:var(--accent2)44" onclick="calibrateAllJours()">⚖️ Calibrer la semaine</button>
     </div>
     <div id="planning-day-content"></div>
   </div>
@@ -881,6 +933,11 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
       <h2 style="margin-bottom:12px">📊 Totaux semaine</h2>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="totaux-semaine"></div>
     </div>
+  </div>
+  <!-- Bas de page -->
+  <div style="display:flex;gap:var(--s2);justify-content:flex-end;padding-top:var(--s4);border-top:1px solid var(--border);margin-top:var(--s3)">
+    <button class="btn btn-ghost btn-sm" onclick="printView('planning')">🖨 Imprimer</button>
+    <button class="btn btn-ghost btn-sm" style="color:var(--danger);border-color:var(--danger)44" onclick="resetAll()">🗑 Réinitialiser</button>
   </div>
 </div>
 
@@ -893,11 +950,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   <p class="subtitle">Générée automatiquement. Quantités adaptées au nombre de repas actifs.</p>
   <div class="courses-header">
     <button class="btn btn-green" onclick="generateCourses()">🔄 Recalculer</button>
-    <button class="btn btn-ghost btn-sm" onclick="resetChecks()">Décocher tout</button>
-    <button class="btn btn-ghost btn-sm" onclick="openPrixEditor()">💰 Modifier les prix</button>
-    <button class="btn btn-green btn-sm" onclick="shareCourses()">📤 Partager</button>
-    <button class="btn btn-ghost btn-sm" onclick="printView('courses')">🖨️ Imprimer courses</button>
-    <div style="margin-left:auto;font-size:13px;color:var(--muted)">Coûts estimés semaine</div>
+    <button class="btn btn-ghost btn-sm" onclick="printView('courses')">🖨 Imprimer</button>
   </div>
   <div id="courses-container"></div>
 </div>
@@ -1198,61 +1251,61 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
     </button>
   </div>
   <div style="display:flex;justify-content:center;margin-top:10px;">
-    <button class="theme-btn" id="theme-btn-mobile" onclick="toggleTheme()" style="font-size:13px;padding:8px 20px;">☀️ Mode jour</button>
+    <button class="theme-btn" id="theme-btn-mobile" onclick="toggleTheme()" style="font-size:13px;padding:8px 20px;">🌙 Mode sombre</button>
   </div>
 </div>
 
 <script>
 // ══════════════════════════════════════════════════════════ DATA
 const DEFAULT_ALIMENTS = [
-  {id:'lentille',nom:'Lentille (cuite)',cat:'feculent',prot:10.1,gluc:16.2,lip:0.6,kcal:125,fibres:8.4,prixKg:0,ratio_sec_cuit:0.4},
-  {id:'pois_chiche',nom:'Pois chiche (cuit)',cat:'feculent',prot:8.3,gluc:17.7,lip:3,kcal:148,fibres:8.2,prixKg:0,ratio_sec_cuit:0.4},
-  {id:'haricot_rouge',nom:'Haricot rouge (cuit)',cat:'feculent',prot:9.6,gluc:12.3,lip:0.6,kcal:116,fibres:11.6,prixKg:0,ratio_sec_cuit:0.45},
-  {id:'haricot_blanc',nom:'Haricot blanc (cuit)',cat:'feculent',prot:6.8,gluc:12,lip:1.1,kcal:112,fibres:13.8,prixKg:0,ratio_sec_cuit:0.45},
-  {id:'quinoa',nom:'Quinoa (cuit)',cat:'feculent',prot:4.7,gluc:27.9,lip:1.1,kcal:149,fibres:3.8,prixKg:0,ratio_sec_cuit:0.4},
-  {id:'pdterre',nom:'Pomme de terre (crue)',cat:'feculent',prot:2,gluc:16.2,lip:0.1,kcal:80,fibres:2.2,prixKg:0,ratio_sec_cuit:1.0},
-  {id:'patate_douce',nom:'Patate douce (cuite)',cat:'feculent',prot:1.7,gluc:16.3,lip:0.1,kcal:79.1,fibres:2.9,prixKg:0,ratio_sec_cuit:1.0},
+  {id:'lentille',nom:'Lentille',cat:'feculent',prot:10.1,gluc:16.2,lip:0.6,kcal:125,fibres:8.4,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'pois_chiche',nom:'Pois chiche',cat:'feculent',prot:8.3,gluc:17.7,lip:3,kcal:148,fibres:8.2,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'haricot_rouge',nom:'Haricot rouge',cat:'feculent',prot:9.6,gluc:12.3,lip:0.6,kcal:116,fibres:11.6,prixKg:0,ratio_sec_cuit:0.45},
+  {id:'haricot_blanc',nom:'Haricot blanc',cat:'feculent',prot:6.8,gluc:12,lip:1.1,kcal:112,fibres:13.8,prixKg:0,ratio_sec_cuit:0.45},
+  {id:'quinoa',nom:'Quinoa',cat:'feculent',prot:4.7,gluc:27.9,lip:1.1,kcal:149,fibres:3.8,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'pdterre',nom:'Pomme de terre',cat:'feculent',prot:2,gluc:16.2,lip:0.1,kcal:80,fibres:2.2,prixKg:0,ratio_sec_cuit:1.0},
+  {id:'patate_douce',nom:'Patate douce',cat:'feculent',prot:1.7,gluc:16.3,lip:0.1,kcal:79.1,fibres:2.9,prixKg:0,ratio_sec_cuit:1.0},
   {id:'avoine',nom:'Flocons d\'avoine',cat:'feculent',prot:10.6,gluc:57.7,lip:7.8,kcal:369,fibres:11.2,prixKg:0,ratio_sec_cuit:0.33},
-  {id:'riz',nom:'Riz blanc (cuit)',cat:'feculent',prot:3.1,gluc:33.2,lip:0.7,kcal:155,fibres:1.4,prixKg:0,ratio_sec_cuit:0.33},
-  {id:'riz_complet',nom:'Riz complet (cuit)',cat:'feculent',prot:3.9,gluc:37.6,lip:1.8,kcal:187,fibres:2.1,prixKg:0,ratio_sec_cuit:0.33},
-  {id:'boulgour',nom:'Boulgour (cuit)',cat:'feculent',prot:4.3,gluc:24.1,lip:1,kcal:131,fibres:3.7,prixKg:0,ratio_sec_cuit:0.4},
-  {id:'pates',nom:'Pâtes (cuites)',cat:'feculent',prot:6.1,gluc:31.4,lip:1.1,kcal:167,fibres:2.2,prixKg:0,ratio_sec_cuit:0.4},
-  {id:'poulet',nom:'Poulet (filet, cru)',cat:'viande',prot:23.4,gluc:0,lip:1.5,kcal:110,fibres:0,prixKg:0},
-  {id:'dinde',nom:'Dinde (escalope, crue)',cat:'viande',prot:23.7,gluc:0,lip:1.5,kcal:108,fibres:0,prixKg:0},
-  {id:'boeuf5',nom:'Bœuf haché 5% MG (cru)',cat:'viande',prot:21.9,gluc:0.3,lip:4.6,kcal:130,fibres:0,prixKg:0},
+  {id:'riz',nom:'Riz blanc',cat:'feculent',prot:3.1,gluc:33.2,lip:0.7,kcal:155,fibres:1.4,prixKg:0,ratio_sec_cuit:0.33},
+  {id:'riz_complet',nom:'Riz complet',cat:'feculent',prot:3.9,gluc:37.6,lip:1.8,kcal:187,fibres:2.1,prixKg:0,ratio_sec_cuit:0.33},
+  {id:'boulgour',nom:'Boulgour',cat:'feculent',prot:4.3,gluc:24.1,lip:1,kcal:131,fibres:3.7,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'pates',nom:'Pâtes',cat:'feculent',prot:6.1,gluc:31.4,lip:1.1,kcal:167,fibres:2.2,prixKg:0,ratio_sec_cuit:0.4},
+  {id:'poulet',nom:'Poulet filet',cat:'viande',prot:23.4,gluc:0,lip:1.5,kcal:110,fibres:0,prixKg:0},
+  {id:'dinde',nom:'Dinde escalope',cat:'viande',prot:23.7,gluc:0,lip:1.5,kcal:108,fibres:0,prixKg:0},
+  {id:'boeuf5',nom:'Bœuf haché 5% MG',cat:'viande',prot:21.9,gluc:0.3,lip:4.6,kcal:130,fibres:0,prixKg:0},
   {id:'jambon',nom:'Jambon cuit supérieur',cat:'viande',prot:21,gluc:0.8,lip:2.8,kcal:113,fibres:0,prixKg:0},
-  {id:'rumsteck',nom:'Bœuf, rumsteck (cru)',cat:'viande',prot:23.5,gluc:0.4,lip:2.5,kcal:118,fibres:0,prixKg:0},
-  {id:'filet_porc',nom:'Porc, filet mignon (cru)',cat:'viande',prot:21.2,gluc:0.4,lip:4.1,kcal:123,fibres:0,prixKg:0},
-  {id:'saumon',nom:'Saumon (élevage, cru)',cat:'poisson',prot:20.5,gluc:0,lip:12.4,kcal:193,fibres:0,prixKg:0},
-  {id:'thon',nom:'Thon (naturel, boîte)',cat:'poisson',prot:26.8,gluc:0,lip:3.9,kcal:143,fibres:0,prixKg:0},
-  {id:'maquereau',nom:'Maquereau (cru)',cat:'poisson',prot:18.1,gluc:0.9,lip:13.5,kcal:198,fibres:0,prixKg:0},
-  {id:'sardine',nom:'Sardine (huile, boîte)',cat:'poisson',prot:23.3,gluc:0.3,lip:13.7,kcal:217,fibres:0,prixKg:0},
-  {id:'cabillaud',nom:'Cabillaud (cru)',cat:'poisson',prot:18.1,gluc:0,lip:0.6,kcal:77.4,fibres:0,prixKg:0},
-  {id:'oeuf',nom:'Œuf entier (cru)',cat:'oeuf',prot:12.8,gluc:0.1,lip:9.8,kcal:140,fibres:0,prixKg:0},
+  {id:'rumsteck',nom:'Rumsteck',cat:'viande',prot:23.5,gluc:0.4,lip:2.5,kcal:118,fibres:0,prixKg:0},
+  {id:'filet_porc',nom:'Filet mignon porc',cat:'viande',prot:21.2,gluc:0.4,lip:4.1,kcal:123,fibres:0,prixKg:0},
+  {id:'saumon',nom:'Saumon',cat:'poisson',prot:20.5,gluc:0,lip:12.4,kcal:193,fibres:0,prixKg:0},
+  {id:'thon',nom:'Thon boîte',cat:'poisson',prot:26.8,gluc:0,lip:3.9,kcal:143,fibres:0,prixKg:0},
+  {id:'maquereau',nom:'Maquereau',cat:'poisson',prot:18.1,gluc:0.9,lip:13.5,kcal:198,fibres:0,prixKg:0},
+  {id:'sardine',nom:'Sardine boîte',cat:'poisson',prot:23.3,gluc:0.3,lip:13.7,kcal:217,fibres:0,prixKg:0},
+  {id:'cabillaud',nom:'Cabillaud',cat:'poisson',prot:18.1,gluc:0,lip:0.6,kcal:77.4,fibres:0,prixKg:0},
+  {id:'oeuf',nom:'Œuf entier',cat:'oeuf',prot:12.8,gluc:0.1,lip:9.8,kcal:140,fibres:0,prixKg:0},
   {id:'skyr',nom:'Skyr nature 0%',cat:'oeuf',prot:10,gluc:3.8,lip:0.2,kcal:57,fibres:0,prixKg:0},
-  {id:'fromage_blanc',nom:'Fromage blanc 0% MG',cat:'oeuf',prot:7.3,gluc:4.2,lip:0,kcal:48.4,fibres:0,prixKg:0},
-  {id:'brocoli',nom:'Brocoli (cru)',cat:'legume',prot:2.9,gluc:2.1,lip:0.4,kcal:31.9,fibres:2.6,prixKg:0},
-  {id:'epinard',nom:'Épinard (cru)',cat:'legume',prot:2.7,gluc:3.1,lip:0.4,kcal:33.3,fibres:2.6,prixKg:0},
-  {id:'hv',nom:'Haricot vert (cuit)',cat:'legume',prot:2,gluc:3,lip:0.2,kcal:29.4,fibres:4,prixKg:0},
-  {id:'courgette',nom:'Courgette (crue)',cat:'legume',prot:1.2,gluc:1.8,lip:0.3,kcal:16.7,fibres:1,prixKg:0},
-  {id:'carotte',nom:'Carotte (crue)',cat:'legume',prot:0.8,gluc:5.2,lip:0,kcal:30.2,fibres:2.9,prixKg:0},
-  {id:'poivron',nom:'Poivron rouge (cru)',cat:'legume',prot:1.1,gluc:6,lip:0,kcal:33.6,fibres:3.2,prixKg:0},
-  {id:'tomate',nom:'Tomate (crue)',cat:'legume',prot:0.5,gluc:3.4,lip:0,kcal:17.5,fibres:1,prixKg:0},
-  {id:'chou_fleur',nom:'Chou-fleur (cru)',cat:'legume',prot:1.8,gluc:2.1,lip:0.7,kcal:24.9,fibres:2.2,prixKg:0},
-  {id:'chou_rouge',nom:'Chou rouge (cru)',cat:'legume',prot:1.1,gluc:4.3,lip:0,kcal:26.4,fibres:2.8,prixKg:0},
-  {id:'champignon',nom:'Champignon de Paris (cru)',cat:'legume',prot:2.1,gluc:1.8,lip:0.4,kcal:21,fibres:1,prixKg:0},
-  {id:'asperge',nom:'Asperge verte (cuite)',cat:'legume',prot:2.7,gluc:1.7,lip:0.3,kcal:25.3,fibres:2.2,prixKg:0},
-  {id:'artichaut',nom:'Artichaut (cuit)',cat:'legume',prot:2.5,gluc:1,lip:0.3,kcal:33.2,fibres:8.3,prixKg:0},
-  {id:'avocat',nom:'Avocat (cru)',cat:'legume',prot:1.6,gluc:0,lip:20.6,kcal:203,fibres:3.6,prixKg:0},
-  {id:'amandes',nom:'Amande (nature)',cat:'autre',prot:18.8,gluc:9.5,lip:51.3,kcal:615,fibres:12.5,prixKg:0},
-  {id:'noix',nom:'Noix (cerneau, séchée)',cat:'autre',prot:13.3,gluc:6.9,lip:67.3,kcal:709,fibres:6.7,prixKg:0},
-  {id:'noisette',nom:'Noisette (nature)',cat:'autre',prot:14.4,gluc:7.2,lip:56.9,kcal:632,fibres:11.6,prixKg:0},
-  {id:'huile_olive',nom:'Huile d\'olive vierge extra',cat:'autre',prot:0.2,gluc:0,lip:99.9,kcal:899,fibres:0,prixKg:0},
+  {id:'fromage_blanc',nom:'Fromage blanc 0%',cat:'oeuf',prot:7.3,gluc:4.2,lip:0,kcal:48.4,fibres:0,prixKg:0},
+  {id:'brocoli',nom:'Brocoli',cat:'legume',prot:2.9,gluc:2.1,lip:0.4,kcal:31.9,fibres:2.6,prixKg:0},
+  {id:'epinard',nom:'Épinard',cat:'legume',prot:2.7,gluc:3.1,lip:0.4,kcal:33.3,fibres:2.6,prixKg:0},
+  {id:'hv',nom:'Haricot vert',cat:'legume',prot:2,gluc:3,lip:0.2,kcal:29.4,fibres:4,prixKg:0},
+  {id:'courgette',nom:'Courgette',cat:'legume',prot:1.2,gluc:1.8,lip:0.3,kcal:16.7,fibres:1,prixKg:0},
+  {id:'carotte',nom:'Carotte',cat:'legume',prot:0.8,gluc:5.2,lip:0,kcal:30.2,fibres:2.9,prixKg:0},
+  {id:'poivron',nom:'Poivron rouge',cat:'legume',prot:1.1,gluc:6,lip:0,kcal:33.6,fibres:3.2,prixKg:0},
+  {id:'tomate',nom:'Tomate',cat:'legume',prot:0.5,gluc:3.4,lip:0,kcal:17.5,fibres:1,prixKg:0},
+  {id:'chou_fleur',nom:'Chou-fleur',cat:'legume',prot:1.8,gluc:2.1,lip:0.7,kcal:24.9,fibres:2.2,prixKg:0},
+  {id:'chou_rouge',nom:'Chou rouge',cat:'legume',prot:1.1,gluc:4.3,lip:0,kcal:26.4,fibres:2.8,prixKg:0},
+  {id:'champignon',nom:'Champignon de Paris',cat:'legume',prot:2.1,gluc:1.8,lip:0.4,kcal:21,fibres:1,prixKg:0},
+  {id:'asperge',nom:'Asperge verte',cat:'legume',prot:2.7,gluc:1.7,lip:0.3,kcal:25.3,fibres:2.2,prixKg:0},
+  {id:'artichaut',nom:'Artichaut',cat:'legume',prot:2.5,gluc:1,lip:0.3,kcal:33.2,fibres:8.3,prixKg:0},
+  {id:'avocat',nom:'Avocat',cat:'legume',prot:1.6,gluc:0,lip:20.6,kcal:203,fibres:3.6,prixKg:0},
+  {id:'amandes',nom:'Amande',cat:'autre',prot:18.8,gluc:9.5,lip:51.3,kcal:615,fibres:12.5,prixKg:0},
+  {id:'noix',nom:'Noix',cat:'autre',prot:13.3,gluc:6.9,lip:67.3,kcal:709,fibres:6.7,prixKg:0},
+  {id:'noisette',nom:'Noisette',cat:'autre',prot:14.4,gluc:7.2,lip:56.9,kcal:632,fibres:11.6,prixKg:0},
+  {id:'huile_olive',nom:'Huile d\'olive',cat:'autre',prot:0.2,gluc:0,lip:99.9,kcal:899,fibres:0,prixKg:0},
   {id:'huile_noix',nom:'Huile de noix',cat:'autre',prot:0,gluc:0,lip:100,kcal:900,fibres:0,prixKg:0},
   {id:'graines_lin',nom:'Graines de lin',cat:'autre',prot:19,gluc:6.5,lip:40.3,kcal:528,fibres:24.4,prixKg:0},
   {id:'graines_chia',nom:'Graines de chia',cat:'autre',prot:16.5,gluc:7.7,lip:30.7,kcal:454,fibres:34.4,prixKg:0},
-  {id:'framboise',nom:'Framboise (crue)',cat:'autre',prot:1.2,gluc:5.8,lip:0.8,kcal:47.9,fibres:4.3,prixKg:0},
-  {id:'poire',nom:'Poire (crue)',cat:'autre',prot:0.4,gluc:12.3,lip:0.3,kcal:56.6,fibres:2.9,prixKg:0},
+  {id:'framboise',nom:'Framboise',cat:'autre',prot:1.2,gluc:5.8,lip:0.8,kcal:47.9,fibres:4.3,prixKg:0},
+  {id:'poire',nom:'Poire',cat:'autre',prot:0.4,gluc:12.3,lip:0.3,kcal:56.6,fibres:2.9,prixKg:0},
   {id:'pomme',nom:'Pomme (crue)',cat:'autre',prot:0.2,gluc:11.6,lip:0.2,kcal:54,fibres:1.4,prixKg:0},
   {id:'whey',nom:'Whey protéine',cat:'autre',prot:75,gluc:6,lip:4,kcal:367,fibres:0,prixKg:0},
   {id:'barre',nom:'Barre protéinée',cat:'autre',prot:20,gluc:20,lip:7,kcal:200,fibres:3,prixKg:0},
@@ -1266,7 +1319,6 @@ const DEFAULT_BATCH = [
   {id:'b5', action:'Blanchir brocolis + haricots verts',       detail:'Al dente — 7-8 min, eau salée',              duree:8,  cuisson:'Eau bouillante'},
   {id:'b6', action:'Poêler dinde puis bœuf (séparément)',      detail:'Assaisonner, portionner à 150g',             duree:15, cuisson:'Poêle feu moyen'},
   {id:'b7', action:'Cuire cabillaud vapeur ou papillote',      detail:'Portionner à 180g',                          duree:12, cuisson:'Vapeur / Four'},
-  {id:'b8', action:'Préparer sauce curry (poulet jeudi)',       detail:'Curry, lait de coco, oignon',                duree:8,  cuisson:'Poêle feu doux'},
   {id:'b9', action:'Portionner dans les boîtes',               detail:'14 boîtes (7 déj + 7 dîners) — étiqueter',   duree:20, cuisson:'—'},
   {id:'b10',action:'Ranger frigo + congeler V/S/D',            detail:'Vendredi→Dimanche au congélateur dès maintenant',duree:5,cuisson:'—'},
 ];
@@ -1275,6 +1327,13 @@ const JOURS_DEFAUT = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Di
 const REPAS_TYPES  = ['petit-dejeuner','dejeuner','diner'];
 const REPAS_LABELS = {'petit-dejeuner':'🌅 Petit-déjeuner','dejeuner':'🍱 Déjeuner','diner':'🌙 Dîner'};
 const COLLATION    = {prot:20,gluc:20,lip:7,kcal:200,fibres:3}; // Barre protéinée (whey PDJ comptée séparément)
+const SCHEMA_VERSION = 3;
+// ── Profil multi-utilisateur ─────────────────────────────────
+const URL_PROFIL = new URLSearchParams(window.location.search).get('profil') || 'default';
+const STORAGE_KEY = 'mealprep_v3_' + URL_PROFIL;
+// Nettoyer le nom pour l'affichage (majuscule première lettre)
+const PROFIL_NOM = URL_PROFIL === 'default' ? '' : URL_PROFIL.charAt(0).toUpperCase() + URL_PROFIL.slice(1);
+
 const OBJ_DEFAUT   = {kcal:2350,prot:150,gluc:230,lip:65,fibres:30,poidscible:80,poidsactuel:90,
   taille:175,age:30,sexe:'homme',activite:1.55,eau:2.0,activite_type:'standard'};
 
@@ -1284,7 +1343,24 @@ let timers = {}; // {id: {interval, remaining}}
 
 // ══════════════════════════════════════════════════════════ STATE
 function loadState() {
-  try { const s = localStorage.getItem('mealprep_v2'); if(s) state = {...state,...JSON.parse(s)}; } catch(e){}
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s) {
+      const parsed = JSON.parse(s);
+      state = {...state,...parsed};
+      // Migration forcée si ancienne version de schema
+      if((state._schemaVersion||0) < SCHEMA_VERSION) {
+        // Garder aliments et objectifs, réinitialiser le reste
+        const keepAliments  = state.aliments?.length ? JSON.parse(JSON.stringify(state.aliments)) : null;
+        const keepObjectifs = state.objectifs?.kcal   ? JSON.parse(JSON.stringify(state.objectifs)) : null;
+        state.jours   = [];
+        state.semaines = [];
+        if(keepAliments)  state.aliments  = keepAliments;
+        if(keepObjectifs) state.objectifs = keepObjectifs;
+        state._schemaVersion = SCHEMA_VERSION;
+      }
+    }
+  } catch(e) {}
   if(!state.aliments?.length) state.aliments = JSON.parse(JSON.stringify(DEFAULT_ALIMENTS));
   if(!state.objectifs?.kcal) state.objectifs = {...OBJ_DEFAUT};
   if(!state.objectifs.fibres) state.objectifs.fibres = 30;
@@ -1297,6 +1373,7 @@ function loadState() {
   if(!state.repasTypes) state.repasTypes = [];
   if(!state.eau) state.eau = {};
   if(!state.exercices) state.exercices = {};
+  if(!state.coursesNotes) state.coursesNotes = {};
   if(!state.collationPerso) state.collationPerso = {active:false,nom:'Barre protéinée',kcal:200,prot:20,gluc:20,lip:7,fibres:3};
   if(state.selectedJour === undefined) state.selectedJour = 0;
   if(state.selectedPlanningJour === undefined) state.selectedPlanningJour = 0;
@@ -1312,8 +1389,26 @@ function loadState() {
       a.prixKg = Math.round(a.prix100 * 10 * 100) / 100;
       delete a.prix100;
     }
-    // Ratio cru/cuit obsolète — nettoyage
     delete a.ratio_cru;
+    // Migration : mettre à jour depuis DEFAULT_ALIMENTS
+    // (noms nettoyés, ratio_sec_cuit ajouté, fibres corrigées)
+    const ref = DEFAULT_ALIMENTS.find(d => d.id === a.id);
+    if(ref) {
+      a.nom = ref.nom;            // nom nettoyé
+      a.prot = ref.prot;          // valeurs Ciqual 2025
+      a.gluc = ref.gluc;
+      a.lip  = ref.lip;
+      a.kcal = ref.kcal;
+      a.fibres = ref.fibres;
+      if(ref.ratio_sec_cuit !== undefined) a.ratio_sec_cuit = ref.ratio_sec_cuit;
+      else delete a.ratio_sec_cuit;
+    }
+  });
+  // Ajouter les nouveaux aliments de DEFAULT_ALIMENTS absents du localStorage
+  DEFAULT_ALIMENTS.forEach(ref => {
+    if(!state.aliments.find(a => a.id === ref.id)) {
+      state.aliments.push({...ref});
+    }
   });
   // Migration collation_active par jour
   state.jours.forEach(j => { if(j.collation_active===undefined) j.collation_active=true; });
@@ -1321,7 +1416,7 @@ function loadState() {
   state.jours.forEach(j => {
     j.repas.forEach(r => {
       if(r.type === 'petit-dejeuner' && !r.pdj_mode) r.pdj_mode = 'skyrwhey';
-      if(r.collapsed === undefined) r.collapsed = false;
+      if(r.collapsed === undefined) r.collapsed = true;
       if(!r.extras) r.extras = [];
       if(r.manuel_active === undefined) r.manuel_active = false;
       if(r.manuel_kcal === undefined) r.manuel_kcal = 0;
@@ -1339,11 +1434,11 @@ function saveState() {
       state.semaines = state.semaines.slice(0,4);
       toast('Historique réduit (limite stockage)');
     }
-    localStorage.setItem('mealprep_v2', JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch(e) {
     // Quota dépassé — vider l'historique et réessayer
     state.semaines = state.semaines?.slice(0,2) || [];
-    try { localStorage.setItem('mealprep_v2', JSON.stringify(state)); } catch(e2) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e2) {}
     toast('⚠️ Stockage limité, historique réduit');
   }
 }
@@ -1362,6 +1457,8 @@ function initJours() {
       // Repas manuel (déj inactif)
       manuel_active: false,
       manuel_kcal:0, manuel_prot:0, manuel_gluc:0, manuel_lip:0,
+      collapsed: true,
+      extras: [],
     }))
   }));
 }
@@ -1429,7 +1526,7 @@ function renderPlanningDay() {
   const tot  = calcJour(jour);
   const nR   = jour.repas.filter(r=>r.active).length;
   const pct  = obj.kcal ? Math.round(tot.kcal/obj.kcal*100) : 0;
-  const barCol = tot.kcal>obj.kcal*1.08?'var(--red)':tot.kcal>obj.kcal*0.92?'var(--accent)':'var(--accent3)';
+  const barCol = tot.kcal>obj.kcal*1.08?'var(--danger)':tot.kcal>obj.kcal*0.92?'var(--accent)':'var(--accent3)';
   cont.innerHTML = `
     <div class="day-card" style="border-color:${jour.active?barCol:'var(--border)'}">
       <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
@@ -1447,6 +1544,7 @@ function renderPlanningDay() {
           <span class="mini-macro mm-p">${r0(tot.prot)}g P</span>
           <span class="mini-macro mm-g">${r0(tot.gluc)}g G</span>
           <span class="mini-macro mm-l">${r0(tot.lip)}g L</span>
+          ${(tot.fibres||0)>0?`<span class="mini-macro mm-f">${r1(tot.fibres)}g F</span>`:''}
         </div>`:''}
         <button onclick="copyJour(${ji})" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:3px 8px;font-size:11px;cursor:pointer">⎘ Copier</button>
       </div>
@@ -1471,7 +1569,7 @@ function renderPlanningLegacy() {
       else if(pct > 0.80) borderClass = 'near-obj';
     }
     const kcalPct = obj.kcal ? Math.min(100, Math.round(tot.kcal/obj.kcal*100)) : 0;
-    const barColor = borderClass==='over-obj' ? 'var(--red)' : borderClass==='good-obj' ? 'var(--accent)' : 'var(--accent3)';
+    const barColor = borderClass==='over-obj' ? 'var(--danger)' : borderClass==='good-obj' ? 'var(--accent)' : 'var(--accent3)';
     const div = document.createElement('div');
     div.className = `day-card${jour.active?'':' disabled'} ${borderClass}`;
     div.id = `day-${ji}`;
@@ -1536,8 +1634,8 @@ function renderRepasRow(ji, ri, repas) {
       </label>
       ${summaryInline?`<span style="font-size:11px;color:var(--muted);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:140px">${summaryInline}</span>`:''}
       <div style="display:flex;gap:4px;align-items:center;margin-left:auto">
-        ${hasData?`<span class="mini-macro mm-k" style="font-size:10px;padding:2px 6px">${r0(tot.kcal)}</span>
-        <span class="mini-macro mm-p" style="font-size:10px;padding:2px 6px">${r0(tot.prot)}P</span>`:''}
+        ${hasData?`<span class="mini-macro mm-k" style="font-size:10px">${r0(tot.kcal)}</span>
+        <span class="mini-macro mm-p" style="font-size:10px">${r0(tot.prot)}P</span>`:''}
         ${!isPdj && repas.active?`<button onclick="event.stopPropagation();openRepasTypeMenu(${ji},${ri})"
           title="Repas types" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 7px;transition:all .2s"
           onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">⭐</button>`:''}
@@ -1673,7 +1771,7 @@ function renderTotaux() {
   const scoreS = getScoreJour(moyTot, obj);
   const _tot = document.getElementById('totaux-semaine'); if(!_tot) return;
   _tot.innerHTML = [
-    {lbl:'Kcal semaine',val:r0(tot.kcal),moy:n?r0(tot.kcal/n):0,ob:obj.kcal,unit:'kcal',col:'var(--purple)',target:obj.kcal*n},
+    {lbl:'Kcal semaine',val:r0(tot.kcal),moy:n?r0(tot.kcal/n):0,ob:obj.kcal,unit:'kcal',col:'#0891B2',target:obj.kcal*n},
     {lbl:'Protéines',   val:r0(tot.prot),moy:n?r0(tot.prot/n):0,ob:obj.prot,unit:'g',   col:'var(--accent)', target:obj.prot*n},
     {lbl:'Glucides',    val:r0(tot.gluc),moy:n?r0(tot.gluc/n):0,ob:obj.gluc,unit:'g',   col:'var(--accent2)',target:obj.gluc*n},
     {lbl:'Lipides',     val:r0(tot.lip), moy:n?r0(tot.lip/n):0, ob:obj.lip, unit:'g',   col:'var(--accent3)',target:obj.lip*n},
@@ -1823,7 +1921,7 @@ function printView(target) {
   }
   const titles = {planning:'Planning repas', courses:'Liste de courses', journee:'Ma journée'};
   header.innerHTML = `<div class="print-logo">🥗 MealPrep</div>
-    <div class="print-meta">${titles[target]||target}${dateStr?' — Semaine du '+dateStr:''}<br><span style="color:#999">Imprimé le ${new Date().toLocaleDateString('fr-FR')}</span></div>`;
+    <div class="print-meta">${titles[target]||target}${dateStr?' — Semaine du '+dateStr:''}<br><span style="color:var(--text3)">Imprimé le ${new Date().toLocaleDateString('fr-FR')}</span></div>`;
 
   window.print();
 
@@ -1859,17 +1957,20 @@ function renderJournee() {
 function renderJourSelectBar() {
   const bar = document.getElementById('jour-select-bar');
   if(!bar) return;
-  const obj = state.objectifs;
+  const LETTRES = ['L','M','Me','J','V','S','D'];
+  const isSemaine = document.getElementById('journee-panel-semaine')?.style.display !== 'none';
   bar.innerHTML = state.jours.map((j,i) => {
-    const tot = calcJour(j);
-    const pct = obj.kcal ? Math.round(tot.kcal/obj.kcal*100) : 0;
-    const col = j.active ? (pct>108?'var(--red)':pct>92?'var(--accent)':'var(--accent3)') : 'var(--muted)';
-    const sel = state.selectedJour===i;
-    return `<button class="jour-btn${sel?' selected':''}" onclick="selectJour(${i})">
-      ${j.nom}
-      <span style="display:block;font-size:9px;color:${sel?'inherit':col};font-weight:700">${j.active?pct+'%':'off'}</span>
-    </button>`;
-  }).join('');
+    const sel = !isSemaine && state.selectedJour===i;
+    const lettre = LETTRES[i] || j.nom.charAt(0);
+    return `<button class="jour-btn${sel?' selected':''}" onclick="selectJourFromBar(${i})" title="${j.nom}">${lettre}</button>`;
+  }).join('')
+  + `<button class="jour-btn jour-btn-semaine${isSemaine?' selected':''}" id="btn-semaine" onclick="switchJourneeMode('semaine')" title="Récap semaine">📊</button>`;
+}
+
+function selectJourFromBar(i) {
+  const isSemaine = document.getElementById('journee-panel-semaine')?.style.display !== 'none';
+  if(isSemaine) switchJourneeMode('vue');
+  selectJour(i);
 }
 
 function selectJour(i) {
@@ -1920,23 +2021,23 @@ function renderJourneeContent() {
   const objKcal     = obj.kcal || 0;
   const reste       = objKcal - r0(kcalNet || tot.kcal);
   const pctRepas    = objKcal ? Math.min(110, Math.round(tot.kcal/objKcal*100)) : 0;
-  const barCol      = tot.kcal > objKcal*1.08 ? 'var(--red)' : tot.kcal > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
+  const barCol      = tot.kcal > objKcal*1.08 ? 'var(--danger)' : tot.kcal > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
 
   // Bannière résumé rapide
   // Alerte fibres
   const objFibres = obj.fibres || 30;
   const fibresJour = r1(tot.fibres||0);
   const fibresAlert = fibresJour < objFibres * 0.7
-    ? {txt:`Seulement <strong>${fibresJour}g de fibres</strong> planifiés — objectif ${objFibres}g. Ajoute des légumes ou légumineuses.`, col:'var(--accent3)', bg:'#7c2d1222', icon:'🌾'}
+    ? {txt:`Seulement <strong>${fibresJour}g de fibres</strong> planifiés — objectif ${objFibres}g. Ajoute des légumes ou légumineuses.`, col:'var(--accent3)', bg:'var(--warn)11', icon:'🌾'}
     : null;
 
   const bannerMsg = (() => {
     if(!objKcal) return null;
     const ref = kcalExo ? r0(kcalNet) : r0(tot.kcal);
     const diff = objKcal - ref;
-    if(diff > 50)  return {txt:`Il te reste <strong>${diff} kcal</strong> à consommer aujourd'hui`, col:'var(--accent2)',  bg:'#0c4a6e22', icon:'⬇️'};
-    if(diff < -50) return {txt:`Tu as dépassé l'objectif de <strong>${Math.abs(diff)} kcal</strong>`, col:'var(--red)',     bg:'#7f1d1d22', icon:'⚠️'};
-    return             {txt:`Tu es dans ta cible kcal — bien joué !`,                                  col:'var(--accent)', bg:'#14532d22', icon:'✅'};
+    if(diff > 50)  return {txt:`Il te reste <strong>${diff} kcal</strong> à consommer aujourd'hui`, col:'var(--accent2)',  bg:'var(--info)11', icon:'⬇️'};
+    if(diff < -50) return {txt:`Tu as dépassé l'objectif de <strong>${Math.abs(diff)} kcal</strong>`, col:'var(--danger)',     bg:'var(--danger)11', icon:'⚠️'};
+    return             {txt:`Tu es dans ta cible kcal — bien joué !`,                                  col:'var(--accent)', bg:'var(--accent-dim)', icon:'✅'};
   })();
 
   let html = `<div class="jour-card">
@@ -2040,13 +2141,13 @@ function renderJourneeContent() {
           <span class="mini-macro mm-p">${r0(tot.prot)}g P</span>
           <span class="mini-macro mm-g">${r0(tot.gluc)}g G</span>
           <span class="mini-macro mm-l">${r0(tot.lip)}g L</span>
-          ${tot.fibres?`<span class="mini-macro" style="background:#4c1d9533;color:var(--purple)">${r1(tot.fibres)}g F</span>`:''}
+          ${obj.fibres?`<span class="mini-macro mm-f">${r1(tot.fibres||0)}g F</span>`:''}
         </div>
       </div>
       <div class="gram-row">
-        ${aV ? `<div class="gram-item"><div class="gram-label">🥩 Protéine</div><div class="gram-val" style="color:var(--red)">${r.viande_g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${aV.nom}</div></div>` : ''}
-        ${aF ? '<div class="gram-item"><div class="gram-label">🍚 Féculent</div><div class="gram-val" style="color:var(--accent2)">'+r.feculent_g+'<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">'+aF.nom+(aF.ratio_sec_cuit&&aF.ratio_sec_cuit<1?' <span style="font-size:10px;color:var(--info)">(cuit)</span>':'')+'</div></div>' : ''}
-        ${aL ? `<div class="gram-item"><div class="gram-label">🥦 Légume</div><div class="gram-val" style="color:var(--accent)">${r.legume_g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${aL.nom}</div></div>` : ''}
+        ${aV ? `<div class="gram-item"><div class="gram-label">🥩 Protéine <span style="color:var(--text3);font-size:10px">(cru)</span></div><div class="gram-val" style="color:var(--red)">${r.viande_g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${aV.nom}</div></div>` : ''}
+        ${aF ? '<div class="gram-item"><div class="gram-label">🍚 Féculent ' + (aF.ratio_sec_cuit&&aF.ratio_sec_cuit<1 ? '<span style="color:var(--info);font-size:10px">(cuit)</span>' : '<span style="color:var(--text3);font-size:10px">(cru)</span>') + '</div><div class="gram-val" style="color:var(--accent2)">'+r.feculent_g+'<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">'+aF.nom+'</div></div>' : ''}
+        ${aL ? `<div class="gram-item"><div class="gram-label">🥦 Légume <span style="color:var(--text3);font-size:10px">(cru)</span></div><div class="gram-val" style="color:var(--accent)">${r.legume_g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${aL.nom}</div></div>` : ''}
         ${(r.extras||[]).map(ex=>{const aE=getA(ex.id);return aE?`<div class="gram-item"><div class="gram-label">➕ ${aE.nom}</div><div class="gram-val" style="color:var(--muted)">${ex.g}<span style="font-size:14px;font-weight:400"> g</span></div><div class="gram-aliment">${r0(calcM(aE.id,ex.g).kcal)} kcal</div></div>`:''}).join('')}
       </div>
     </div>
@@ -2105,12 +2206,12 @@ function generateCourses() {
   const coll = state.jours.some(j=>j.active && j.collation_active);
   const cats = ['viande','poisson','oeuf','feculent','legume','autre'];
   const catL = {viande:'🥩 Viandes & Protéines',poisson:'🐟 Poissons',oeuf:'🥚 Œufs & Laitiers',feculent:'🍚 Féculents',legume:'🥦 Légumes',autre:'💊 Compléments'};
-  let html = `<table class="courses-table"><thead><tr><th style="width:28px"></th><th>Produit</th><th>Quantité</th><th>Prix est.</th><th>Notes</th></tr></thead><tbody>`;
+  let html = `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="courses-table"><thead><tr><th style="width:32px"></th><th>Produit</th><th style="white-space:nowrap">Quantité</th></tr></thead><tbody>`;
   let total = 0;
   cats.forEach(cat => {
     const items = state.aliments.filter(a => a.cat===cat && (usage[a.id] || (cat==='autre'&&coll&&(a.id==='whey'||a.id==='barre'))));
     if(!items.length) return;
-    html += `<tr class="cat-header"><td colspan="5">${catL[cat]}</td></tr>`;
+    html += `<tr class="cat-header"><td colspan="3">${catL[cat]}</td></tr>`;
     items.forEach(a => {
       let gT = usage[a.id]||0;
       let qtyStr='', note='';
@@ -2120,32 +2221,40 @@ function generateCourses() {
       } else {
         if(!gT) return;
         if(a.cat==='feculent' && a.ratio_sec_cuit && a.ratio_sec_cuit < 1) {
-          // Convertir cuit → sec pour l'achat
+          // Quantité à acheter = poids SEC
           const gSec = r0(gT * a.ratio_sec_cuit);
-          const secStr = gSec>=1000 ? r1(gSec/1000)+' kg' : gSec+'g';
-          qtyStr = gT>=1000 ? r1(gT/1000)+' kg cuit' : r0(gT)+'g cuit';
-          note = `⚖️ Acheter <strong>${secStr} sec</strong>`;
+          qtyStr = gSec>=1000 ? r1(gSec/1000)+' kg sec' : gSec+'g sec';
+          const ratio = Math.round(1/a.ratio_sec_cuit);
+          note = `${gT>=1000?r1(gT/1000)+' kg':r0(gT)+'g'} cuit (×${ratio} à la cuisson)`;
+        } else if(a.cat==='feculent') {
+          // p.de terre, patate douce : même poids cru/cuit
+          qtyStr = gT>=1000 ? r1(gT/1000)+' kg' : r0(gT)+'g';
+          note = 'Peser avant cuisson';
         } else {
           qtyStr = gT>=1000 ? `${r1(gT/1000)} kg` : `${r0(gT)} g`;
         }
-        if(a.cat==='viande'||a.cat==='poisson') note='Batch cook dimanche';
         if(a.id==='skyr') note='PDJ — '+nPdjSkyr+' × 250g';
         if(a.id==='whey' && usage['whey']>0) note='PDJ — '+nPdjSkyr+' × 30g';
-        if(a.cat==='feculent' && (!a.ratio_sec_cuit || a.ratio_sec_cuit>=1)) note='Peser cuit';
       }
       const prix = a.prixKg ? r1(gT*a.prixKg/1000) : 0;
       if(prix) total += prix;
       const checked = state.courses[a.id]||false;
       html += `<tr class="${checked?'checked-row':''}" id="cr-${a.id}">
         <td class="check-cell"><input type="checkbox" ${checked?'checked':''} onchange="toggleCheck('${a.id}',this.checked)"></td>
-        <td>${a.nom}</td>
-        <td><strong class="qty-total">${qtyStr}</strong></td>
-        <td class="prix-cell">${prix?prix.toFixed(2)+' €':'—'}</td>
-        <td style="font-size:12px">${note}</td>
+        <td>
+          <div style="font-weight:600">${a.nom}</div>
+          ${note?`<div style="font-size:11px;color:var(--info);margin-top:2px">${note}</div>`:''}
+          <input type="text" value="${(state.coursesNotes&&state.coursesNotes[a.id])||''}"
+            placeholder="Note…"
+            onchange="if(!state.coursesNotes)state.coursesNotes={};state.coursesNotes['${a.id}']=this.value;saveState()"
+            style="background:transparent;border:none;border-bottom:1px dashed var(--border);color:var(--text2);font-size:11px;width:100%;max-width:200px;padding:2px 0;font-family:var(--font-body);outline:none;margin-top:2px"
+            onclick="event.stopPropagation()">
+        </td>
+        <td style="white-space:nowrap"><strong class="qty-total">${qtyStr}</strong></td>
       </tr>`;
     });
   });
-  html += `<tr class="total-row"><td colspan="2">💰 Total estimé semaine</td><td></td><td style="color:var(--accent3)">${total.toFixed(2)} €</td><td></td></tr></tbody></table>`;
+  html += `</tbody></table></div>`;
   const c = document.getElementById('courses-container');
   if(c) c.innerHTML = html;
   const n = state.jours.filter(j=>j.active).reduce((a,j)=>a+j.repas.filter(r=>r.active).length,0);
@@ -2266,6 +2375,7 @@ function shareCourses() {
         if(a.cat==='feculent' && a.ratio_sec_cuit && a.ratio_sec_cuit < 1) {
           const gSec = r0(gT * a.ratio_sec_cuit);
           qtyStr = gSec>=1000 ? r1(gSec/1000)+' kg sec' : gSec+'g sec';
+          note = '(= '+r0(gT)+'g cuit × '+Math.round(1/a.ratio_sec_cuit)+')';
         } else {
           qtyStr = gT>=1000 ? `${r1(gT/1000)} kg` : `${r0(gT)}g`;
         }
@@ -2408,7 +2518,7 @@ function importData() {
           j.repas.forEach(r => {
             if(r.type==='petit-dejeuner' && !r.pdj_mode) r.pdj_mode='skyrwhey';
             if(!r.extras) r.extras=[];
-            if(r.collapsed===undefined) r.collapsed=false;
+            if(r.collapsed===undefined) r.collapsed=true;
           });
         });
         if(!state.objectifs.fibres) state.objectifs.fibres=30;
@@ -2659,7 +2769,7 @@ function renderBatch() {
   if(!cont) return;
   const bqtysForCount = calcBatchQtys();
   const ALWAYS_FOR_COUNT = ['b1','b9','b10'];
-  if(bqtysForCount['poulet']||bqtysForCount['dinde']) ALWAYS_FOR_COUNT.push('b8');
+
   const stepsVisible = DEFAULT_BATCH.filter(s => ALWAYS_FOR_COUNT.includes(s.id) || (BATCH_STEP_ALIMENTS[s.id]||[]).some(a=>bqtysForCount[a]));
   const done_count = stepsVisible.filter(s => state.batch[s.id]?.done).length;
   const pct = Math.round(done_count / (stepsVisible.length||1) * 100);
@@ -2674,8 +2784,7 @@ function renderBatch() {
   const bqtys = calcBatchQtys();
   // Étapes toujours visibles
   const ALWAYS_SHOW = ['b1','b9','b10'];
-  // b8 (sauce curry) visible seulement si poulet dans le menu
-  if(bqtys['poulet'] || bqtys['dinde']) ALWAYS_SHOW.push('b8');
+
 
   const stepsToShow = DEFAULT_BATCH.filter(step => {
     if(ALWAYS_SHOW.includes(step.id)) return true;
@@ -2733,21 +2842,32 @@ function updateBatchCuisson(id, val) {
 
 // ══════════════════════════════════════════════════════════ RESET
 function resetAll() {
-  if(!confirm('Remettre à zéro TOUTES les données ? (planning, suivi, exercices, historique)\nLes aliments et objectifs sont conservés.')) return;
-  state.jours = [];
-  state.suivi = [];
-  state.exercices = {};
-  state.courses = {};
-  state.batch = {};
-  state.semaines = [];
-  state.repasTypes = [];
-  state.eau = {};
-  state.selectedJour = 0;
+  if(!confirm('Remettre à zéro le planning, suivi et historique ?\nLes aliments et objectifs sont conservés.')) return;
+  const savedAliments   = JSON.parse(JSON.stringify(state.aliments));
+  const savedObjectifs  = JSON.parse(JSON.stringify(state.objectifs));
+  const savedCollation  = JSON.parse(JSON.stringify(state.collationPerso || {}));
+  state.jours           = [];
+  state.suivi           = [];
+  state.exercices       = {};
+  state.courses         = {};
+  state.coursesNotes    = {};
+  state.batch           = {};
+  state.semaines        = [];
+  state.repasTypes      = [];
+  state.eau             = {};
+  state.selectedJour    = 0;
+  state.selectedPlanningJour = 0;
+  state.aliments        = savedAliments;
+  state.objectifs       = savedObjectifs;
+  state.collationPerso  = savedCollation;
   initJours();
   DEFAULT_BATCH.forEach(db => { state.batch[db.id] = {done:false,cuisson:db.cuisson}; });
   saveState();
-  renderPlanning(); renderJournee(); renderEau(); renderHistorique();
+  generateCourses();
+  renderPlanning();
+  renderHistorique();
   showTab('journee');
+  setTimeout(() => { renderJournee(); renderEau(); switchJourneeMode('vue'); }, 100);
   toast('Remise à zéro effectuée ✓');
 }
 
@@ -2839,9 +2959,9 @@ function renderBilan() {
       const kcalNet   = kcalRepas - kcalExo;
       const pctRepas  = objKcal ? Math.min(110, Math.round(kcalRepas/objKcal*100)) : 0;
       const pctNet    = objKcal ? Math.min(110, Math.round(kcalNet/objKcal*100)) : 0;
-      const barCol    = kcalRepas > objKcal*1.08 ? 'var(--red)' : kcalRepas > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
-      const netCol    = kcalNet   > objKcal*1.08 ? 'var(--red)' : kcalNet   > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
-      const statut    = kcalNet   > objKcal*1.08 ? {icon:'❌',txt:'Dépassé',col:'var(--red)'} :
+      const barCol    = kcalRepas > objKcal*1.08 ? 'var(--danger)' : kcalRepas > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
+      const netCol    = kcalNet   > objKcal*1.08 ? 'var(--danger)' : kcalNet   > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
+      const statut    = kcalNet   > objKcal*1.08 ? {icon:'❌',txt:'Dépassé',col:'var(--danger)'} :
                         kcalNet   > objKcal*0.92 ? {icon:'✅',txt:'Dans la cible',col:'var(--accent)'} :
                         {icon:'⚠️',txt:'En dessous',col:'var(--accent3)'};
       const dateLabel = dateKey ? ' <span style="font-size:11px;color:var(--muted);font-weight:400">'+new Date(dateKey+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+'</span>' : '';
@@ -2858,7 +2978,7 @@ function renderBilan() {
         + '</div>'
         + '<div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:3px"><div style="height:100%;width:'+(kcalExo?pctNet:pctRepas)+'%;background:'+(kcalExo?netCol:barCol)+';border-radius:4px;transition:width .4s"></div></div>'
         + '<div style="text-align:right;font-size:10px;color:var(--muted)">'+(kcalExo?pctNet:pctRepas)+'% de l\'objectif'+(kcalExo?' (net)':'')+'</div>'
-        + (exosJour.length ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #ffffff11">'
+        + (exosJour.length ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)44">'
           + exosJour.map(function(e){ return '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:2px 0"><span>🏃 '+e.nom+'</span><div style="display:flex;gap:6px;align-items:center"><span style="color:var(--accent)">−'+e.kcal+' kcal</span><button onclick="deleteExercice(\''+dateKey+'\','+e.id+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0">✕</button></div></div>'; }).join('')
           + '</div>' : '')
         + '</div>';
@@ -2901,7 +3021,7 @@ function renderBilanJourDate(date, label, kcalRepas, exos, obj) {
       <div style="font-family:var(--font-display);font-weight:700;font-size:15px">${label}</div>
       <div style="display:flex;gap:8px;font-size:12px;flex-wrap:wrap">
         ${kcalRepas?`<span class="mini-macro mm-k">🍽 ${kcalRepas} kcal</span>`:''}
-        ${kcalExo?`<span style="background:#14532d33;color:var(--accent);border-radius:12px;padding:2px 8px;font-weight:600">🏃 −${kcalExo} kcal</span>`:''}
+        ${kcalExo?`<span style="background:var(--accent-dim);color:var(--accent);border-radius:12px;padding:2px 8px;font-weight:600">🏃 −${kcalExo} kcal</span>`:''}
         ${kcalRepas&&kcalExo?`<span style="background:var(--bg3);border-radius:12px;padding:2px 8px;font-weight:600;color:var(--muted)">Net ${kcalNet} kcal</span>`:''}
       </div>
     </div>
@@ -3082,7 +3202,16 @@ function renderSuivi() {
   drawChart();
 }
 
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 function drawChart() {
+  const isLight = document.body.classList.contains('light');
+  const colText    = getCSSVar('--text2') || (isLight ? '#495057' : '#8B949E');
+  const colGrid    = getCSSVar('--border') || (isLight ? '#DEE2E7' : '#30363D');
+  const colLine    = getCSSVar('--info')   || (isLight ? '#2563EB' : '#58A6FF');
+  const colTarget  = getCSSVar('--accent') || '#16A34A';
+  const colFill    = isLight ? 'rgba(37,99,235,0.08)' : 'rgba(56,189,248,0.10)';
   const canvas=document.getElementById('chart-canvas');
   if(!canvas) return;
   const ctx=canvas.getContext('2d');
@@ -3090,7 +3219,7 @@ function drawChart() {
   canvas.width=W; canvas.height=H;
   ctx.clearRect(0,0,W,H);
   if(!state.suivi.length) {
-    ctx.fillStyle='#6b7280'; ctx.font='14px DM Sans'; ctx.textAlign='center';
+    ctx.fillStyle=colText; ctx.font='14px DM Sans'; ctx.textAlign='center';
     ctx.fillText('Aucune donnée',W/2,H/2); return;
   }
   const obj=state.objectifs.poidscible||80;
@@ -3101,38 +3230,38 @@ function drawChart() {
   const toX=i=>pad.l+(i/(state.suivi.length>1?state.suivi.length-1:1))*(W-pad.l-pad.r);
   const toY=v=>pad.t+(1-(v-minP)/(maxP-minP))*(H-pad.t-pad.b);
   // Grille
-  ctx.strokeStyle='#2a2f4288'; ctx.lineWidth=1;
+  ctx.strokeStyle=colGrid; ctx.lineWidth=1;
   for(let i=0;i<=4;i++) {
     const y=pad.t+i*(H-pad.t-pad.b)/4;
     ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
-    ctx.fillStyle='#6b7280'; ctx.font='11px DM Sans'; ctx.textAlign='right';
+    ctx.fillStyle=colText; ctx.font='11px DM Sans'; ctx.textAlign='right';
     ctx.fillText(r1(maxP-i*(maxP-minP)/4)+'kg',pad.l-4,y+4);
   }
   // Ligne objectif
   const yO=toY(obj);
-  ctx.strokeStyle='#4ade8055'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+  ctx.strokeStyle=colTarget+'55'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
   ctx.beginPath(); ctx.moveTo(pad.l,yO); ctx.lineTo(W-pad.r,yO); ctx.stroke();
-  ctx.setLineDash([]); ctx.fillStyle='#4ade80'; ctx.font='11px DM Sans'; ctx.textAlign='left';
+  ctx.setLineDash([]); ctx.fillStyle=colTarget; ctx.font='11px DM Sans'; ctx.textAlign='left';
   ctx.fillText(`Obj ${obj}kg`,pad.l+4,yO-4);
   // Zone
   if(state.suivi.length>1) {
     ctx.beginPath(); ctx.moveTo(toX(0),toY(poids[0]));
     poids.forEach((p,i)=>i>0&&ctx.lineTo(toX(i),toY(p)));
     ctx.lineTo(toX(poids.length-1),H-pad.b); ctx.lineTo(toX(0),H-pad.b);
-    ctx.closePath(); ctx.fillStyle='#38bdf81a'; ctx.fill();
+    ctx.closePath(); ctx.fillStyle=colFill; ctx.fill();
   }
   // Courbe
-  ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  ctx.strokeStyle=colLine; ctx.lineWidth=2.5; ctx.lineJoin='round';
   ctx.beginPath();
   poids.forEach((p,i)=>i===0?ctx.moveTo(toX(i),toY(p)):ctx.lineTo(toX(i),toY(p)));
   ctx.stroke();
   // Points + labels
   poids.forEach((p,i)=>{
     ctx.beginPath(); ctx.arc(toX(i),toY(p),4,0,Math.PI*2);
-    ctx.fillStyle='#38bdf8'; ctx.fill();
+    ctx.fillStyle=colLine; ctx.fill();
     ctx.fillStyle='var(--text)'; ctx.font='bold 10px DM Sans'; ctx.textAlign='center';
     ctx.fillText(p,toX(i),toY(p)-9);
-    ctx.fillStyle='#6b7280'; ctx.font='10px DM Sans';
+    ctx.fillStyle=colText; ctx.font='10px DM Sans';
     ctx.fillText(labels[i],toX(i),H-pad.b+16);
   });
 }
@@ -3141,12 +3270,12 @@ function drawChart() {
 function renderObjectifs() {
   const obj=state.objectifs;
   const ogrid = document.getElementById('obj-grid') || document.querySelector('#subpanel-objectifs .obj-grid-inner'); if(document.getElementById('obj-grid')) document.getElementById('obj-grid').innerHTML=[
-    {title:'Calories / jour',  val:obj.kcal,   unit:'kcal',col:'var(--purple)',sub:'Déficit modéré ~300-500 kcal'},
+    {title:'Calories / jour',  val:obj.kcal,   unit:'kcal',col:'#0891B2',sub:'Déficit modéré ~300-500 kcal'},
     {title:'Protéines / jour', val:obj.prot,   unit:'g',   col:'var(--accent)', sub:'~1.8g/kg — préserve le muscle'},
     {title:'Glucides / jour',  val:obj.gluc,   unit:'g',   col:'var(--accent2)',sub:'Moduler selon l\'activité'},
     {title:'Lipides / jour',   val:obj.lip,    unit:'g',   col:'var(--accent3)',sub:'Privilégier oméga-3'},
-    {title:'Poids cible',      val:obj.poidscible,unit:'kg',col:'var(--purple)',sub:'Objectif de forme'},
-    {title:'Poids de départ',  val:obj.poidsactuel||'?',unit:'kg',col:'var(--red)',sub:'À renseigner'},
+    {title:'Poids cible',      val:obj.poidscible,unit:'kg',col:'var(--info)',sub:'Objectif de forme'},
+    {title:'Poids de départ',  val:obj.poidsactuel||'?',unit:'kg',col:'var(--danger)',sub:'À renseigner'},
     ...(obj.poidscible&&obj.poidsactuel&&obj.kcal&&obj.age&&obj.taille ? (()=>{
       const sexe = obj.sexe||'homme';
       const bmr  = sexe==='femme' ? 10*obj.poidsactuel+6.25*obj.taille-5*obj.age-161 : 10*obj.poidsactuel+6.25*obj.taille-5*obj.age+5;
@@ -3197,16 +3326,20 @@ function saveObjectifs() {
 // ══════════════════════════════════════════════════════════ THEME
 function toggleTheme() {
   const light=document.body.classList.toggle('light');
-  const label=light?'🌙 Mode nuit':'☀️ Mode jour';
+  const label=light?'🌑 Mode sombre':'☀️ Mode clair';
   ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=label;});
   localStorage.setItem('mealprep_theme',light?'light':'dark');
-  if(state.suivi.length) setTimeout(drawChart,50);
+  setTimeout(() => { if(state.suivi.length) drawChart(); }, 50);
 }
 function applyTheme() {
-  if(localStorage.getItem('mealprep_theme')==='light') {
+  const saved = localStorage.getItem('mealprep_theme');
+  if(saved === 'light') {
     document.body.classList.add('light');
-    const label='🌙 Mode nuit';
-    ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=label;});
+    ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='🌑 Mode sombre';});
+  } else {
+    // Mode sombre par défaut
+    document.body.classList.remove('light');
+    ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='☀️ Mode clair';});
   }
 }
 
@@ -3236,7 +3369,7 @@ function calcTDEE() {
   const deficit500 = tdee - 500;
   const imc        = r1(poids / (taille/100)**2);
   const imcCat     = imc < 18.5 ? 'Insuffisance pondérale' : imc < 25 ? 'Poids normal' : imc < 30 ? 'Surpoids' : 'Obésité';
-  const imcCol     = imc < 18.5 ? 'var(--accent2)' : imc < 25 ? 'var(--accent)' : imc < 30 ? 'var(--accent3)' : 'var(--red)';
+  const imcCol     = imc < 18.5 ? 'var(--accent2)' : imc < 25 ? 'var(--accent)' : imc < 30 ? 'var(--accent3)' : 'var(--danger)';
 
   // ── 1. Protéines recommandées selon le poids ──────────────────
   const protMin = r0(poids * 1.6);
@@ -3286,7 +3419,7 @@ function calcTDEE() {
   if(!el) return;
 
   el.innerHTML = `
-    ${reval_alert ? '<div style="background:#7c2d1233;border:1px solid var(--accent3);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--accent3)">'+reval_alert+'</div>' : ''}
+    ${reval_alert ? '<div style="background:var(--warn)22;border:1px solid var(--accent3);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--accent3)">'+reval_alert+'</div>' : ''}
 
     <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="tdee-result">${tdee}</span>
@@ -3421,7 +3554,7 @@ function renderMacrosBars(prot, gluc, lip, obj, fibres) {
     { label:'🟢 Protéines', val:r0(prot), obj:obj?.prot||0, col:'var(--accent)',  unit:'g', kcal:r0(prot*4) },
     { label:'🔵 Glucides',  val:r0(gluc), obj:obj?.gluc||0, col:'var(--accent2)', unit:'g', kcal:r0(gluc*4) },
     { label:'🟠 Lipides',   val:r0(lip),  obj:obj?.lip||0,  col:'var(--accent3)', unit:'g', kcal:r0(lip*9)  },
-    ...(fibres!==undefined ? [{ label:'🌾 Fibres', val:r1(fibres), obj:obj?.fibres||30, col:'var(--purple)', unit:'g', kcal:0 }] : []),
+    ...(fibres!==undefined ? [{ label:'🌾 Fibres', val:r1(fibres||0), obj:obj?.fibres||30, col:'#7C3AED', unit:'g', kcal:0 }] : []),
   ];
   return items.map(it => {
     const pct = it.obj ? Math.min(100, Math.round(it.val/it.obj*100)) : 0;
@@ -3436,7 +3569,7 @@ function renderMacrosBars(prot, gluc, lip, obj, fibres) {
         </span>
       </div>
       <div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:${over?'var(--red)':it.col};border-radius:4px;transition:width .4s"></div>
+        <div style="height:100%;width:${pct}%;background:${over?'var(--danger)':it.col};border-radius:4px;transition:width .4s"></div>
       </div>
       ${it.obj?`<div style="font-size:10px;color:${pct>=90?it.col:'var(--muted)'};margin-top:2px;text-align:right">${pct}% de l'objectif</div>`:''}
     </div>`;
@@ -3757,7 +3890,7 @@ function showTab(name) {
   const mt = document.getElementById('mtab-'+name);
   if(mt) mt.classList.add('active');
   closeMobileMore();
-  if(name==='suivi')      { renderSuivi(); setTimeout(drawChart,50); }
+  if(name==='suivi')      { renderSuivi(); setTimeout(drawChart,50); showSubTab('poids'); }
   if(name==='parametres') { renderObjectifs(); calcTDEE(); renderAliments(); renderRepasTypes(); }
   if(name==='courses')    generateCourses();
   if(name==='journee')    { renderJournee(); renderEau(); switchJourneeMode('vue'); }
@@ -3824,6 +3957,13 @@ window.addEventListener('resize',()=>{ if(state.suivi.length) drawChart(); });
 
 document.addEventListener('DOMContentLoaded',()=>{
   applyTheme();
+  // Titre dynamique
+  if(PROFIL_NOM) document.title = 'MealPrep · ' + PROFIL_NOM;
+  // Afficher le nom du profil dans le logo
+  if(PROFIL_NOM) {
+    const logo = document.getElementById('nav-logo-label');
+    if(logo) logo.innerHTML = 'Meal<span>Prep</span> <span style="font-size:11px;font-weight:500;opacity:.55;font-family:var(--font-body);letter-spacing:0">· ' + PROFIL_NOM + '</span>';
+  }
   loadState();
   const d=document.getElementById('semaine-date');
   if(d&&!d.value) {
@@ -3851,6 +3991,27 @@ document.addEventListener('DOMContentLoaded',()=>{
     switchJourneeMode('vue');
   }, 0);
 });
+</script>
+
+<script>
+// Enregistrement du Service Worker inline (via Blob)
+if('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'mealprep-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).catch(() => r))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
 </script>
 </body>
 </html>
