@@ -44,6 +44,8 @@
   --accent-light: #22C55E;
   --accent-dim:   #16A34A22;
   --accent-hover: #15803D;
+  --accent2:      #3B82F6;
+  --accent3:      #F59E0B;
 
   /* Sémantiques */
   --danger:  #F85149;
@@ -887,7 +889,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   <div class="nav-tab" onclick="showTab('historique')">📅 Historique</div>
   <div class="nav-tab" onclick="showTab('suivi')">📈 Suivi</div>
   <div class="nav-tab" onclick="showTab('parametres')">⚙️ Paramètres</div>
-
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" style="margin-left:auto;align-self:center">☀️ Mode clair</button>
 </nav>
 
 
@@ -965,13 +967,10 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 
 <!-- ══════════════════════════════════════════ PARAMETRES (sous-onglets) -->
 <div id="tab-parametres" class="page">
-  <div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4);flex-wrap:wrap">
-    <div class="sub-tabs" style="margin-bottom:0;flex:1;min-width:200px">
-      <button class="sub-tab active" onclick="showSubTab('objectifs')" style="font-size:12px;min-height:36px;padding:6px 8px">🎯 Objectifs</button>
-      <button class="sub-tab" onclick="showSubTab('aliments')" style="font-size:12px;min-height:36px;padding:6px 8px">🥗 Aliments</button>
-      <button class="sub-tab" onclick="showSubTab('repastypes')" style="font-size:12px;min-height:36px;padding:6px 8px">🍱 Repas types</button>
-    </div>
-    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" style="flex-shrink:0;white-space:nowrap">☀️ Mode clair</button>
+  <div class="sub-tabs" style="margin-bottom:var(--s4)">
+    <button class="sub-tab active" onclick="showSubTab('objectifs')" style="font-size:12px;min-height:36px;padding:6px 8px">🎯 Objectifs</button>
+    <button class="sub-tab" onclick="showSubTab('aliments')" style="font-size:12px;min-height:36px;padding:6px 8px">🥗 Aliments</button>
+    <button class="sub-tab" onclick="showSubTab('repastypes')" style="font-size:12px;min-height:36px;padding:6px 8px">🍱 Repas types</button>
   </div>
 
   <!-- Sous-onglet Aliments -->
@@ -1238,20 +1237,20 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 </div>
 
 <!-- MOBILE MORE MENU -->
-<div id="mobile-more-menu" style="display:none;position:fixed;bottom:64px;right:0;left:0;background:var(--bg2);border-top:1px solid var(--border);z-index:199;padding:8px 16px 12px;">
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-    <button class="mobile-tab" id="mtab-historique" onclick="showTab('historique');closeMobileMore()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:60px;">
+<div id="mobile-more-menu" style="display:none;position:fixed;bottom:calc(64px + env(safe-area-inset-bottom,0px));right:0;left:0;background:var(--bg2);border-top:1px solid var(--border);z-index:199;padding:10px 12px;">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+    <button class="mobile-tab" id="mtab-historique" onclick="showTab('historique');closeMobileMore()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:56px;">
       <span class="m-icon">📅</span><span class="m-label">Historique</span>
     </button>
-    <button class="mobile-tab" id="mtab-suivi" onclick="showTab('suivi');closeMobileMore()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:60px;">
+    <button class="mobile-tab" id="mtab-suivi" onclick="showTab('suivi');closeMobileMore()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:56px;">
       <span class="m-icon">📈</span><span class="m-label">Suivi</span>
     </button>
-    <button class="mobile-tab" id="mtab-parametres" onclick="showTab('parametres');closeMobileMore()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:60px;">
+    <button class="mobile-tab" id="mtab-parametres" onclick="showTab('parametres');closeMobileMore()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:56px;">
       <span class="m-icon">⚙️</span><span class="m-label">Paramètres</span>
     </button>
-  </div>
-  <div style="display:flex;justify-content:center;margin-top:10px;">
-    <button class="theme-btn" id="theme-btn-mobile" onclick="toggleTheme()" style="font-size:13px;padding:8px 20px;">🌙 Mode sombre</button>
+    <button class="mobile-tab" id="theme-btn-mobile" onclick="toggleTheme()" style="background:var(--bg3);border-radius:10px;border:1px solid var(--border);min-height:56px;">
+      <span class="m-icon">☀️</span><span class="m-label" id="theme-label-mobile">Mode clair</span>
+    </button>
   </div>
 </div>
 
@@ -2013,31 +2012,9 @@ function renderJourneeContent() {
   const pctRepas    = objKcal ? Math.min(110, Math.round(tot.kcal/objKcal*100)) : 0;
   const barCol      = tot.kcal > objKcal*1.08 ? 'var(--danger)' : tot.kcal > objKcal*0.92 ? 'var(--accent)' : 'var(--accent3)';
 
-  // Bannière résumé rapide
-  // Alerte fibres
-  const objFibres = obj.fibres || 30;
-  const fibresJour = r1(tot.fibres||0);
-  const fibresAlert = fibresJour < objFibres * 0.7
-    ? {txt:`Seulement <strong>${fibresJour}g de fibres</strong> planifiés — objectif ${objFibres}g. Ajoute des légumes ou légumineuses.`, col:'var(--accent3)', bg:'var(--warn)11', icon:'🌾'}
-    : null;
 
-  const bannerMsg = (() => {
-    if(!objKcal) return null;
-    const ref = kcalExo ? r0(kcalNet) : r0(tot.kcal);
-    const diff = objKcal - ref;
-    if(diff > 50)  return {txt:`Il te reste <strong>${diff} kcal</strong> à consommer aujourd'hui`, col:'var(--accent2)',  bg:'var(--info)11', icon:'⬇️'};
-    if(diff < -50) return {txt:`Tu as dépassé l'objectif de <strong>${Math.abs(diff)} kcal</strong>`, col:'var(--danger)',     bg:'var(--danger)11', icon:'⚠️'};
-    return             {txt:`Tu es dans ta cible kcal — bien joué !`,                                  col:'var(--accent)', bg:'var(--accent-dim)', icon:'✅'};
-  })();
 
   let html = `<div class="jour-card">
-    ${fibresAlert?`<div style="background:${fibresAlert.bg};border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:8px"><span style="font-size:18px">${fibresAlert.icon}</span><span style="font-size:13px;color:${fibresAlert.col}">${fibresAlert.txt}</span></div>`:''}
-    ${bannerMsg?`<div style="background:${bannerMsg.bg};border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:18px">${bannerMsg.icon}</span>
-      <span style="font-size:13px;color:${bannerMsg.col}">${bannerMsg.txt}</span>
-    </div>`:''}
-    ${score?`<div style="margin-bottom:12px"><span class="score-badge ${score.cls}">${score.label}</span></div>`:''}
-
     <!-- Bilan kcal visuel -->
     ${objKcal ? `
     <div style="background:var(--bg3);border-radius:12px;padding:14px 16px;margin-bottom:16px">
@@ -3318,7 +3295,8 @@ function saveObjectifs() {
 function toggleTheme() {
   const light=document.body.classList.toggle('light');
   const label=light?'🌑 Mode sombre':'☀️ Mode clair';
-  ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=label;});
+  ['theme-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=label;});
+  const lm3=document.getElementById('theme-label-mobile');if(lm3)lm3.textContent=label.replace(/^[^ ]+ /,'');
   localStorage.setItem('mealprep_theme',light?'light':'dark');
   setTimeout(() => { if(state.suivi.length) drawChart(); }, 50);
 }
@@ -3326,11 +3304,13 @@ function applyTheme() {
   const saved = localStorage.getItem('mealprep_theme');
   if(saved === 'light') {
     document.body.classList.add('light');
-    ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='🌑 Mode sombre';});
+    ['theme-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='🌑 Mode sombre';});
+    const lm=document.getElementById('theme-label-mobile');if(lm)lm.textContent='Mode sombre';
   } else {
     // Mode sombre par défaut
     document.body.classList.remove('light');
-    ['theme-btn','theme-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='☀️ Mode clair';});
+    ['theme-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='☀️ Mode clair';});
+    const lm2=document.getElementById('theme-label-mobile');if(lm2)lm2.textContent='Mode clair';
   }
 }
 
