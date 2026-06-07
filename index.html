@@ -451,18 +451,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   color: #fff;
   box-shadow: 0 1px 4px rgba(22,163,74,.35);
 }
-.jour-btn-semaine {
-  flex: 0 0 44px;
-  border-left: 1px solid var(--border);
-  border-radius: 0 var(--r2) var(--r2) 0;
-  font-size: 16px;
-  padding: 9px 0;
-}
-.jour-btn-semaine.selected {
-  background: var(--bg2);
-  color: var(--accent);
-  box-shadow: none;
-}
+
 
 /* ── Day card ────────────────────────────────────────── */
 .day-card {
@@ -814,11 +803,26 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
     margin-bottom: var(--s2) !important;
     page-break-inside: avoid;
   }
-  .courses-table th { background: #16A34A !important; color: #fff !important; }
-  .courses-table td { border-bottom: 1px solid #e9ecef; }
+  /* Courses print compact */
+  .courses-table { font-size: 11px !important; }
+  .courses-table th { display: none !important; }
+  .courses-table td { padding: 3px 6px !important; border-bottom: 1px solid #eee !important; }
+  .courses-table .cat-header td {
+    font-size: 10px !important; font-weight: 700 !important;
+    text-transform: uppercase !important; letter-spacing: .5px !important;
+    padding: 8px 6px 2px !important; color: #16A34A !important;
+    border-top: 1px solid #16A34A !important; border-bottom: none !important;
+    background: transparent !important;
+  }
+  .courses-table .qty-total { font-size: 11px !important; font-weight: 700 !important; }
+  /* 2 colonnes sur la page imprimée */
+  #courses-container > div { column-count: 2 !important; column-gap: 24px !important; }
+  .courses-table { width: 100% !important; break-inside: avoid; }
+  .courses-table tr { break-inside: avoid; }
+  input[type=text] { display: none !important; }
+  .checked-row { opacity: .4 !important; }
   * { background: #fff !important; color: #212529 !important; }
-  h1, h2, .day-name, .batch-card-title { color: #212529 !important; }
-  .courses-table th, .courses-table th * { color: #fff !important; background: #16A34A !important; }
+  h1, h2 { color: #212529 !important; }
 }
 
 /* ── Responsive ──────────────────────────────────────── */
@@ -883,7 +887,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   <div class="nav-tab" onclick="showTab('historique')">📅 Historique</div>
   <div class="nav-tab" onclick="showTab('suivi')">📈 Suivi</div>
   <div class="nav-tab" onclick="showTab('parametres')">⚙️ Paramètres</div>
-  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙 Mode sombre</button>
+
 </nav>
 
 
@@ -927,13 +931,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
     </div>
     <div id="planning-day-content"></div>
   </div>
-  <!-- Panel Semaine -->
-  <div id="journee-panel-semaine" style="display:none">
-    <div class="card" style="margin-bottom:12px">
-      <h2 style="margin-bottom:12px">📊 Totaux semaine</h2>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="totaux-semaine"></div>
-    </div>
-  </div>
+
   <!-- Bas de page -->
   <div style="display:flex;gap:var(--s2);justify-content:flex-end;padding-top:var(--s4);border-top:1px solid var(--border);margin-top:var(--s3)">
     <button class="btn btn-ghost btn-sm" onclick="printView('planning')">🖨 Imprimer</button>
@@ -967,11 +965,13 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 
 <!-- ══════════════════════════════════════════ PARAMETRES (sous-onglets) -->
 <div id="tab-parametres" class="page">
-  <div class="section-title"><h1>⚙️ Paramètres</h1></div>
-  <div class="sub-tabs">
-    <button class="sub-tab active" onclick="showSubTab('objectifs')">🎯 Objectifs</button>
-    <button class="sub-tab" onclick="showSubTab('aliments')">🥗 Aliments</button>
-    <button class="sub-tab" onclick="showSubTab('repastypes')">🍱 Repas types</button>
+  <div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4);flex-wrap:wrap">
+    <div class="sub-tabs" style="margin-bottom:0;flex:1;min-width:200px">
+      <button class="sub-tab active" onclick="showSubTab('objectifs')" style="font-size:12px;min-height:36px;padding:6px 8px">🎯 Objectifs</button>
+      <button class="sub-tab" onclick="showSubTab('aliments')" style="font-size:12px;min-height:36px;padding:6px 8px">🥗 Aliments</button>
+      <button class="sub-tab" onclick="showSubTab('repastypes')" style="font-size:12px;min-height:36px;padding:6px 8px">🍱 Repas types</button>
+    </div>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" style="flex-shrink:0;white-space:nowrap">☀️ Mode clair</button>
   </div>
 
   <!-- Sous-onglet Aliments -->
@@ -1958,18 +1958,15 @@ function renderJourSelectBar() {
   const bar = document.getElementById('jour-select-bar');
   if(!bar) return;
   const LETTRES = ['L','M','Me','J','V','S','D'];
-  const isSemaine = document.getElementById('journee-panel-semaine')?.style.display !== 'none';
   bar.innerHTML = state.jours.map((j,i) => {
-    const sel = !isSemaine && state.selectedJour===i;
+    const sel = state.selectedJour===i;
     const lettre = LETTRES[i] || j.nom.charAt(0);
     return `<button class="jour-btn${sel?' selected':''}" onclick="selectJourFromBar(${i})" title="${j.nom}">${lettre}</button>`;
   }).join('')
-  + `<button class="jour-btn jour-btn-semaine${isSemaine?' selected':''}" id="btn-semaine" onclick="switchJourneeMode('semaine')" title="Récap semaine">📊</button>`;
+;
 }
 
 function selectJourFromBar(i) {
-  const isSemaine = document.getElementById('journee-panel-semaine')?.style.display !== 'none';
-  if(isSemaine) switchJourneeMode('vue');
   selectJour(i);
 }
 
@@ -1982,20 +1979,13 @@ function selectJour(i) {
 }
 
 function switchJourneeMode(mode) {
-  ['vue','edit','semaine'].forEach(m => {
+  ['vue','edit'].forEach(m => {
     const panel = document.getElementById('journee-panel-'+m);
     if(panel) panel.style.display = m===mode ? '' : 'none';
     const btn = document.getElementById('journee-subtab-'+m);
     if(btn) btn.classList.toggle('active', m===mode);
   });
-  // Mettre en surbrillance le bouton semaine dans la barre des jours
-  const btnSemaine = document.getElementById('btn-semaine');
-  if(btnSemaine) btnSemaine.classList.toggle('selected', mode==='semaine');
-  // Désélectionner les jours si on va sur Semaine
-  if(mode==='semaine') {
-    document.querySelectorAll('#jour-select-bar .jour-btn:not(#btn-semaine)').forEach(b=>b.classList.remove('selected'));
-    renderTotaux();
-  }
+  if(mode==='semaine') renderTotaux();
   if(mode==='edit')    renderPlanningDay();
   if(mode==='vue')     { renderJourneeContent(); renderEau(); }
 }
@@ -2842,33 +2832,34 @@ function updateBatchCuisson(id, val) {
 
 // ══════════════════════════════════════════════════════════ RESET
 function resetAll() {
-  if(!confirm('Remettre à zéro le planning, suivi et historique ?\nLes aliments et objectifs sont conservés.')) return;
+  if(!confirm('Réinitialiser les menus de la semaine ?\nLe suivi poids, l\'historique et les objectifs sont conservés.')) return;
   const savedAliments   = JSON.parse(JSON.stringify(state.aliments));
   const savedObjectifs  = JSON.parse(JSON.stringify(state.objectifs));
   const savedCollation  = JSON.parse(JSON.stringify(state.collationPerso || {}));
+  const savedSuivi      = JSON.parse(JSON.stringify(state.suivi || []));
+  const savedExercices  = JSON.parse(JSON.stringify(state.exercices || {}));
+  const savedSemaines   = JSON.parse(JSON.stringify(state.semaines || []));
   state.jours           = [];
-  state.suivi           = [];
-  state.exercices       = {};
   state.courses         = {};
   state.coursesNotes    = {};
   state.batch           = {};
-  state.semaines        = [];
-  state.repasTypes      = [];
   state.eau             = {};
   state.selectedJour    = 0;
   state.selectedPlanningJour = 0;
   state.aliments        = savedAliments;
   state.objectifs       = savedObjectifs;
   state.collationPerso  = savedCollation;
+  state.suivi           = savedSuivi;
+  state.exercices       = savedExercices;
+  state.semaines        = savedSemaines;
   initJours();
   DEFAULT_BATCH.forEach(db => { state.batch[db.id] = {done:false,cuisson:db.cuisson}; });
   saveState();
   generateCourses();
   renderPlanning();
-  renderHistorique();
   showTab('journee');
   setTimeout(() => { renderJournee(); renderEau(); switchJourneeMode('vue'); }, 100);
-  toast('Remise à zéro effectuée ✓');
+  toast('Menus réinitialisés ✓');
 }
 
 function resetBatch() {
