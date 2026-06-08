@@ -825,6 +825,57 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
   .checked-row { opacity: .4 !important; }
   * { background: #fff !important; color: #212529 !important; }
   h1, h2 { color: #212529 !important; }
+
+  /* ── Planning condensé ── */
+  .print-planning-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    font-size: 10px;
+  }
+  .print-jour-col {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+  .print-jour-header {
+    background: #16A34A !important;
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 11px;
+    text-align: center;
+    padding: 4px 2px;
+  }
+  .print-jour-header.inactif {
+    background: #ccc !important;
+  }
+  .print-repas-bloc {
+    padding: 4px 5px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .print-repas-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 2px;
+    letter-spacing: .3px;
+  }
+  .print-repas-item {
+    font-size: 9px;
+    line-height: 1.3;
+    color: #212529;
+  }
+  .print-repas-item span {
+    color: #16A34A;
+    font-weight: 600;
+  }
+  .print-macros-line {
+    font-size: 8px;
+    color: #666;
+    margin-top: 2px;
+  }
 }
 
 /* ── Responsive ──────────────────────────────────────── */
@@ -936,7 +987,7 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); 
 
   <!-- Bas de page -->
   <div style="display:flex;gap:var(--s2);justify-content:flex-end;padding-top:var(--s4);border-top:1px solid var(--border);margin-top:var(--s3)">
-    <button class="btn btn-ghost btn-sm" onclick="printView('planning')">🖨 Imprimer</button>
+    <button class="btn btn-ghost btn-sm" onclick="printPlanning()">🖨 Imprimer les menus</button>
     <button class="btn btn-ghost btn-sm" style="color:var(--danger);border-color:var(--danger)44" onclick="resetAll()">🗑 Réinitialiser</button>
   </div>
 </div>
@@ -2683,6 +2734,90 @@ function exportAlimentsJSON() {
   a.click();
   URL.revokeObjectURL(url);
   toast('Base aliments exportée ✓');
+}
+
+
+// ══════════════════════════════════════════════════════════ PRINT PLANNING
+function printPlanning() {
+  const REPAS_SHORT = {'petit-dejeuner':'PDJ','dejeuner':'Déj.','diner':'Dîner'};
+
+  // Construire le HTML condensé
+  let colsHtml = state.jours.map(j => {
+    if(!j.active) return `
+      <div class="print-jour-col">
+        <div class="print-jour-header inactif">${j.nom.slice(0,3)}</div>
+        <div class="print-repas-bloc" style="color:#999;font-size:9px;padding:6px 5px;">—</div>
+      </div>`;
+
+    const totJ = calcJour(j);
+    const repasHtml = j.repas.filter(r=>r.active).map(r => {
+      const tot = calcRepas(r);
+      let items = [];
+
+      if(r.type==='petit-dejeuner') {
+        if(r.pdj_mode==='skyrwhey') items.push('Skyr + Whey');
+        else if(r.pdj_mode==='rien') items.push('—');
+        else items.push('Manuel');
+      } else {
+        const aV = getA(r.viande_id);
+        const aF = getA(r.feculent_id);
+        const aL = getA(r.legume_id);
+        if(aV) items.push(`<span>${aV.nom}</span> ${r.viande_g}g`);
+        if(aF) items.push(`<span>${aF.nom}</span> ${r.feculent_g}g`);
+        if(aL) items.push(`<span>${aL.nom}</span> ${r.legume_g}g`);
+        (r.extras||[]).forEach(ex=>{const a=getA(ex.id);if(a)items.push(`${a.nom} ${ex.g}g`);});
+      }
+
+      return `<div class="print-repas-bloc">
+        <div class="print-repas-label">${REPAS_SHORT[r.type]||r.type}</div>
+        <div class="print-repas-item">${items.join('<br>')}</div>
+        <div class="print-macros-line">${r0(tot.kcal)}kcal · ${r0(tot.prot)}P</div>
+      </div>`;
+    }).join('');
+
+    // Collation si active
+    const collHtml = j.collation_active ? `<div class="print-repas-bloc">
+      <div class="print-repas-label">Coll.</div>
+      <div class="print-repas-item">${state.collationPerso?.active?state.collationPerso.nom:'Barre/Shake'}</div>
+    </div>` : '';
+
+    return `<div class="print-jour-col">
+      <div class="print-jour-header">${j.nom.slice(0,3)}</div>
+      ${repasHtml}${collHtml}
+      <div class="print-repas-bloc" style="background:#f8f9fa">
+        <div class="print-macros-line" style="font-weight:700;color:#16A34A">${r0(totJ.kcal)} kcal · ${r0(totJ.prot)}g P</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Créer un div print temporaire
+  const semaineDate = document.getElementById('semaine-date')?.value;
+  const dateStr = semaineDate ? new Date(semaineDate+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+
+  const printDiv = document.createElement('div');
+  printDiv.id = 'print-planning-temp';
+  printDiv.className = 'print-target';
+  printDiv.style.cssText = 'display:none';
+  printDiv.innerHTML = `
+    <div class="print-header">
+      <div class="print-logo">🥗 MealPrep</div>
+      <div class="print-meta">Menus de la semaine${dateStr?' — '+dateStr:''}<br>
+        <span style="color:#666;font-size:10px">Imprimé le ${new Date().toLocaleDateString('fr-FR')}</span>
+      </div>
+    </div>
+    <div class="print-planning-grid">${colsHtml}</div>`;
+
+  document.body.appendChild(printDiv);
+
+  // Masquer tout sauf ce div
+  document.querySelectorAll('.page').forEach(p=>{p.classList.add('print-hidden-temp');});
+
+  window.print();
+
+  setTimeout(()=>{
+    document.querySelectorAll('.print-hidden-temp').forEach(p=>p.classList.remove('print-hidden-temp'));
+    document.getElementById('print-planning-temp')?.remove();
+  }, 500);
 }
 
 // ══════════════════════════════════════════════════════════ BATCH QUANTITES
