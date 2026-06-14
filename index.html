@@ -1373,6 +1373,57 @@ const DEFAULT_BATCH = [
   {id:'b10',action:'Ranger frigo + congeler V/S/D',            detail:'Vendredi→Dimanche au congélateur dès maintenant',duree:5,cuisson:'—'},
 ];
 
+
+const ALIMENT_CUISSON = {
+  // Viandes
+  'poulet':      {methode:'Four 200°C',     duree:30, note:'Assaisonner, portionner à 150g après'},
+  'dinde':       {methode:'Poêle feu moyen',duree:15, note:'Portionner à 150g'},
+  'boeuf5':      {methode:'Poêle feu vif',  duree:10, note:'Portionner à 150g'},
+  'rumsteck':    {methode:'Poêle feu vif',  duree:8,  note:'Saignant recommandé, portionner à 150g'},
+  'filet_porc':  {methode:'Four 180°C',     duree:25, note:'Portionner à 150g'},
+  'jambon':      {methode:'—',              duree:0,  note:'Prêt à l\'emploi'},
+  // Poissons
+  'saumon':      {methode:'Four 180°C',     duree:15, note:'Papillote recommandée, portionner à 150g'},
+  'cabillaud':   {methode:'Vapeur',         duree:12, note:'Portionner à 150g'},
+  'thon':        {methode:'—',              duree:0,  note:'En boîte — égoutter'},
+  'maquereau':   {methode:'Poêle feu moyen',duree:8,  note:'Portionner à 150g'},
+  'sardine':     {methode:'—',             duree:0,  note:'En boîte — égoutter'},
+  // Féculents (peser SEC avant cuisson)
+  'riz':         {methode:'Eau bouillante', duree:12, note:'1 vol. riz / 2 vol. eau — peser sec'},
+  'riz_complet': {methode:'Eau bouillante', duree:40, note:'1 vol. riz / 2.5 vol. eau — peser sec'},
+  'quinoa':      {methode:'Eau bouillante', duree:15, note:'1 vol. quinoa / 2 vol. eau — peser sec'},
+  'pates':       {methode:'Eau bouillante', duree:10, note:'Eau salée — peser sec'},
+  'boulgour':    {methode:'Eau bouillante', duree:12, note:'1 vol. / 1.5 vol. eau — peser sec'},
+  'lentille':    {methode:'Eau bouillante', duree:25, note:'Pas besoin de trempage — peser sec'},
+  'pois_chiche': {methode:'Eau bouillante', duree:90, note:'Tremper 12h ou utiliser boîte'},
+  'haricot_rouge':{methode:'Eau bouillante',duree:60, note:'Tremper 12h ou utiliser boîte'},
+  'haricot_blanc':{methode:'Eau bouillante',duree:60, note:'Tremper 12h ou utiliser boîte'},
+  'avoine':      {methode:'Eau / lait',     duree:5,  note:'Préparer le matin — peser sec'},
+  'pdterre':     {methode:'Vapeur',         duree:20, note:'Portionner à 150g'},
+  'patate_douce':{methode:'Four 200°C',     duree:35, note:'Portionner à 150g'},
+  // Légumes
+  'brocoli':     {methode:'Vapeur',         duree:8,  note:'Al dente — garder croquant'},
+  'epinard':     {methode:'Poêle 2min',     duree:2,  note:'Wilter à sec ou à l\'huile'},
+  'hv':          {methode:'Eau bouillante', duree:8,  note:'Al dente, eau salée'},
+  'courgette':   {methode:'Poêle feu moyen',duree:8,  note:'Cubes ou lamelles'},
+  'carotte':     {methode:'Vapeur',         duree:12, note:'En rondelles'},
+  'poivron':     {methode:'Four 200°C',     duree:20, note:'Entiers ou en lanières'},
+  'tomate':      {methode:'—',             duree:0,  note:'Cru — laver et couper'},
+  'chou_fleur':  {methode:'Vapeur',         duree:12, note:'En fleurettes'},
+  'chou_rouge':  {methode:'—',             duree:0,  note:'Cru ou brièvement sauté'},
+  'champignon':  {methode:'Poêle feu vif',  duree:5,  note:'À sec en premier'},
+  'asperge':     {methode:'Vapeur',         duree:8,  note:'Al dente'},
+  'artichaut':   {methode:'Eau bouillante', duree:40, note:'Entier — cuire à l\'avance'},
+  'avocat':      {methode:'—',             duree:0,  note:'Cru — couper au moment'},
+  // Oléagineux / autres
+  'amandes':     {methode:'—',             duree:0,  note:'Prêt à l\'emploi'},
+  'noix':        {methode:'—',             duree:0,  note:'Prêt à l\'emploi'},
+  'noisette':    {methode:'—',             duree:0,  note:'Prêt à l\'emploi'},
+  'graines_lin': {methode:'—',             duree:0,  note:'Saupoudrer sur les plats'},
+  'graines_chia':{methode:'—',             duree:0,  note:'Saupoudrer ou pudding'},
+  'huile_olive': {methode:'—',             duree:0,  note:'Assaisonnement'},
+};
+
 const JOURS_DEFAUT = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const REPAS_TYPES  = ['petit-dejeuner','dejeuner','diner'];
 const REPAS_LABELS = {'petit-dejeuner':'🌅 Petit-déjeuner','dejeuner':'🍱 Déjeuner','diner':'🌙 Dîner'};
@@ -2855,18 +2906,121 @@ function formatBatchQty(id, qtys) {
   return `<span style="font-weight:700">${gStr}</span>`;
 }
 
-// Mapping étape → aliments concernés
-const BATCH_STEP_ALIMENTS = {
-  b2: ['riz','quinoa','pates','patate_douce'],    // féculents à l'eau
-  b3: ['poulet','dinde'],                          // volaille four
-  b4: ['pdterre'],                                 // p.de terre vapeur
-  b5: ['brocoli','hv','courgette','epinard','carotte','poivron','tomate'], // légumes blanchis
-  b6: ['dinde','boeuf5','jambon'],                 // poêle
-  b7: ['cabillaud','saumon','thon','crevettes'],   // poisson
-};
+// BATCH_STEP_ALIMENTS obsolète — remplacé par ALIMENT_CUISSON dynamique
+const BATCH_STEP_ALIMENTS = {};
 
 // ══════════════════════════════════════════════════════════ BATCH COOKING
 function renderBatch() {
+  const cont = document.getElementById('batch-container');
+  if(!cont) return;
+
+  const qtys = calcBatchQtys(); // {id: {nom, cat, g_total}}
+
+  if(!Object.keys(qtys).length) {
+    cont.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👨\u200d🍳</div><div class="empty-state-title">Aucun repas planifié</div><div class="empty-state-sub">Compose tes menus dans l\'onglet Journée pour voir le batch cooking.</div></div>';
+    return;
+  }
+
+  // Grouper les aliments par méthode de cuisson
+  const groupes = {};
+  Object.entries(qtys).forEach(([id, q]) => {
+    const info = ALIMENT_CUISSON[id] || {methode:'—', duree:0, note:'Prêt à l\'emploi'};
+    const methode = info.methode;
+    if(!groupes[methode]) groupes[methode] = [];
+    groupes[methode].push({id, ...q, ...info});
+  });
+
+  // Ordre d'affichage logique
+  const ORDRE = ['Four 200°C','Four 180°C','Four 160°C','Eau bouillante','Vapeur','Poêle feu vif','Poêle feu moyen','Poêle 2min','Eau / lait','—'];
+  const methodesSorted = [...new Set([...ORDRE, ...Object.keys(groupes)])].filter(m => groupes[m]);
+
+  // Récap global
+  const dureeTotal = methodesSorted.reduce((s,m) => s + Math.max(...(groupes[m]||[]).map(a=>a.duree||0)),0);
+
+  let html = `
+  <div class="card" style="margin-bottom:var(--s4)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-weight:700;font-size:15px">🧑‍🍳 Batch cooking de la semaine</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">${Object.keys(qtys).length} aliments · ~${dureeTotal} min en parallèle</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="resetBatch()">Tout réinitialiser</button>
+    </div>
+  </div>`;
+
+  methodesSorted.forEach(methode => {
+    const items = groupes[methode];
+    const dureeMax = Math.max(...items.map(a=>a.duree||0));
+    const isNoCook = methode === '—';
+
+    html += `<div class="card" style="margin-bottom:var(--s3)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:var(--s3)">
+        <div style="background:${isNoCook?'var(--bg3)':'var(--accent-dim)'};border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:${isNoCook?'var(--text2)':'var(--accent-light)'}">
+          ${methode}${dureeMax>0?` · ${dureeMax} min`:''}
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border)">
+            <th style="text-align:left;padding:6px 8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Aliment</th>
+            <th style="text-align:right;padding:6px 8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Qté semaine</th>
+            <th style="text-align:center;padding:6px 8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Temps</th>
+            <th style="text-align:left;padding:6px 8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(item => {
+            const a = getA(item.id);
+            const g = item.g_total;
+            let qtyStr, qtyNote = '';
+            if(a && a.ratio_sec_cuit && a.ratio_sec_cuit < 1) {
+              const gSec = r0(g * a.ratio_sec_cuit);
+              const gSecStr = gSec>=1000?r1(gSec/1000)+' kg':gSec+'g';
+              qtyStr = `<span style="font-weight:700;color:var(--info)">${gSecStr} sec</span>`;
+              qtyNote = `→ ${g>=1000?r1(g/1000)+' kg':g+'g'} cuit`;
+            } else {
+              qtyStr = `<span style="font-weight:700">${g>=1000?r1(g/1000)+' kg':g+'g'}</span>`;
+            }
+            return `<tr style="border-bottom:1px solid var(--border)44">
+              <td style="padding:8px 8px;font-weight:600">${item.nom}${qtyNote?'<br><span style="font-size:11px;color:var(--text2)">'+qtyNote+'</span>':''}</td>
+              <td style="padding:8px 8px;text-align:right">${qtyStr}</td>
+              <td style="padding:8px 8px;text-align:center;color:var(--text2)">${item.duree>0?item.duree+' min':'—'}</td>
+              <td style="padding:8px 8px;font-size:11px;color:var(--text2)">${item.note||''}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      ${dureeMax>0?`<div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+        <span class="timer-badge" onclick="startBatchTimer('${methode.replace(/'/g,'').replace(/ /g,'_')}',${dureeMax*60})" id="tbadge-${methode.replace(/[^a-zA-Z0-9]/g,'_')}">⏱ Lancer ${dureeMax} min</span>
+      </div>`:''}
+    </div>`;
+  });
+
+  cont.innerHTML = html;
+}
+
+function startBatchTimer(id, secs) {
+  const badge = document.getElementById('tbadge-'+id);
+  if(!badge) return;
+  if(timers[id]) { clearInterval(timers[id].interval); delete timers[id]; badge.className='timer-badge'; badge.textContent='⏱ Relancer'; return; }
+  let remaining = secs;
+  badge.className='timer-badge running';
+  timers[id] = { interval: setInterval(()=>{
+    remaining--;
+    const m=Math.floor(remaining/60), s=remaining%60;
+    if(badge) badge.textContent=`⏱ ${m}:${s.toString().padStart(2,'0')}`;
+    if(remaining<=0){ clearInterval(timers[id].interval); delete timers[id]; if(badge){badge.className='timer-badge done-t';badge.textContent='✓ Terminé';} }
+  },1000), remaining };
+}
+
+function resetBatch() {
+  DEFAULT_BATCH.forEach(db=>{state.batch[db.id]={done:false,cuisson:db.cuisson};});
+  saveState(); renderBatch();
+  toast('Batch réinitialisé ✓');
+}
+
+// Ancienne fonction (compatibilité)
+function _renderBatch_old() {
   const cont = document.getElementById('batch-container');
   if(!cont) return;
   const bqtysForCount = calcBatchQtys();
@@ -2928,8 +3082,10 @@ function renderBatch() {
       </div>`;
   });
   html += '</div>';
-  cont.innerHTML = html;
+  // (ancienne renderBatch terminée — remplacée par la version dynamique)
 }
+
+function _renderBatch_compat_end() {} // placeholder
 
 function toggleBatchDone(id) {
   if(!state.batch[id]) state.batch[id] = {done:false, cuisson:''};
